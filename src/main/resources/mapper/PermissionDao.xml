@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.PermissionDao">
+
+    <select id="queryFirstMenus" resultType="Permission">
+        SELECT *
+        FROM t_permission
+        WHERE sortstring = 1
+    </select>
+    <delete id="deletePermissionByParentId" parameterType="string">
+        DELETE FROM t_permission
+        WHERE parentid = #{id}
+    </delete>
+    <delete id="deletePermissionsByIds" parameterType="string">
+        DELETE FROM t_permission WHERE parentid in
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <delete id="deleteHasPermissionsByIds" parameterType="string">
+        DELETE FROM t_role_permission WHERE sys_permission_id in
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <insert id="addPermission" parameterType="Permission">
+        INSERT INTO t_permission (id, name, type, url, icon, parentid, parentids, sortstring, available, percode)
+        VALUES (#{id}, #{name}, #{type}, #{url}, #{icon}, #{parentId}, #{parentIds}, #{sortString}, #{available},
+                #{perCode})
+    </insert>
+    <update id="updatePermission" parameterType="Permission">
+        UPDATE t_permission
+        SET name = #{name}, percode = #{perCode}
+        WHERE id = #{id}
+    </update>
+    <select id="queryIdsByParents" parameterType="string" resultType="string">
+        SELECT id
+        FROM t_permission
+        WHERE parentid = #{id}
+    </select>
+    <select id="getSysUserByUserName" resultType="ActiveUser" parameterType="string">
+        SELECT
+            username,
+            password,
+            roleId,
+            name,
+            available
+        FROM t_user
+        WHERE username = #{userName}
+    </select>
+    <update id="updateFirstMenu" parameterType="Permission">
+        UPDATE t_permission
+        SET name = #{name}, url = #{url}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteHasPermissionById" parameterType="string">
+        DELETE FROM t_role_permission
+        WHERE sys_permission_id = #{id}
+    </delete>
+    <select id="queryPermissionsByParentId" parameterType="string" resultType="map">
+        SELECT
+            id,
+            name,
+            url,
+            percode
+        FROM t_permission
+        WHERE parentid = #{id}
+    </select>
+    <select id="queryPermissionsById" parameterType="long" resultType="Permission">
+        SELECT *
+        FROM t_permission
+        WHERE id = #{id}
+    </select>
+    <delete id="delete" parameterType="string">
+        DELETE FROM t_permission
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findMenuListByRoleId" resultType="Permission" parameterType="int">
+        SELECT t_permission.*
+        FROM t_permission
+            LEFT JOIN (SELECT *
+                       FROM t_role_permission) role ON role.sys_role_id = #{roleId}
+        WHERE t_permission.type = 'menu' AND t_permission.id = role.sys_permission_id
+    </select>
+
+    <select id="findPermissionListByRoleId" resultType="Permission" parameterType="int">
+        SELECT t_permission.*
+        FROM t_permission
+            LEFT JOIN (SELECT *
+                       FROM t_role_permission) role ON role.sys_role_id = #{roleId}
+        WHERE t_permission.type != 'menu' AND t_permission.id = role.sys_permission_id
+    </select>
+
+    <select id="queryMenus" resultType="Map" parameterType="int">
+        SELECT
+            permission.name title,
+            permission.icon,
+            permission.id   pid,
+            parentid,
+            permission.url  href
+        FROM t_permission permission
+            LEFT JOIN (SELECT *
+                       FROM t_role_permission) role ON role.sys_role_id = #{roleId}
+        WHERE type = "menu" AND role.sys_permission_id = permission.id
+        ORDER BY parentid ASC, menu_sort ASC
+    </select>
+    <select id="getTopMenus" resultType="Map" parameterType="int">
+        SELECT
+            permission.name title,
+            permission.icon,
+            permission.id   pid
+        FROM t_permission permission
+            LEFT JOIN (SELECT *
+                       FROM t_role_permission) role ON role.sys_role_id = #{roleId}
+        WHERE parentid = 1 AND role.sys_permission_id = permission.id
+    </select>
+
+    <select id="getSideMenus" resultType="map" parameterType="string">
+        SELECT
+            permission.name title,
+            permission.icon,
+            permission.id   pid,
+            permission.url  href
+        FROM t_permission permission
+            LEFT JOIN (SELECT *
+                       FROM t_role_permission) role ON role.sys_role_id = #{roleId}
+        WHERE permission.id = role.sys_permission_id AND parentid = #{parentId}
+    </select>
+</mapper>

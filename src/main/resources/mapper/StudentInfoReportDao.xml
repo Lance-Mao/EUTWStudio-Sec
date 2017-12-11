@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.StudentInfoReportDao">
+    <select id="studentInfoList" parameterType="int" resultType="map">
+        SELECT department.name departmentName,student.name ,level,direction.name directionName,classes.name
+        classesName,student_status,practice_learning_type,
+        teacher.name teacherName,
+        payment_status_first_year firstPayStatus,
+        payment_status_second_year secondPayStatus,
+        payment_status_third_year thirdPayStatus FROM t_student student
+        LEFT JOIN (SELECT id,name FROM t_department) department on department.id = student.department_id
+        LEFT JOIN (SELECT id,name FROM t_direction) direction on direction.id = student.direction_id
+        LEFT JOIN (SELECT id,name,teacher_id FROM t_classes) classes on classes.id = student.classes_id
+        LEFT JOIN (SELECT * FROM t_teacher) teacher on teacher.no = classes.teacher_id
+        WHERE level in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY student.department_id DESC ,student.direction_id DESC ,level ASC,classesName ASC
+    </select>
+    <select id="queryTurnProfessional" parameterType="string" resultType="map">
+        SELECT
+          student.no,
+          student.name,
+          originProfession.code originProfessionId,
+          originProfession.name originProfession,
+          profession.code professionId,
+          profession.name profession
+
+        FROM t_student student
+
+          LEFT JOIN (SELECT
+                       id,
+                       code,
+                       name
+                     FROM t_profession) originProfession ON originProfession.id = student.origin_profession_id
+          LEFT JOIN (SELECT
+                       id,
+                       code,
+                       name
+                     FROM t_profession) profession ON profession.id = student.profession_id
+
+        where student.profession_id != student.origin_profession_id
+       AND student.level = #{level}
+    </select>
+</mapper>

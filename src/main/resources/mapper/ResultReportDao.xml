@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.ResultReportDao">
+
+    <select id="queryStudentsLikesTotalCount" parameterType="map" resultType="long">
+        SELECT count(1) FROM t_student student
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_department) department ON department.id = student.department_id
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_direction) direction ON direction.id = student.direction_id
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_classes) classes ON classes.id = student.classes_id
+        <where>
+            <if test="departmentId!=''">
+                department_id = #{departmentId}
+            </if>
+            <if test="level!=''">
+                AND level = #{level}
+            </if>
+            <if test="directionId!=''">
+                AND direction_id = #{directionId}
+            </if>
+            <if test="classesId!=''">
+                AND  student.classes_id = #{classesId}
+            </if>
+
+            AND student.no LIKE #{no}
+            and student.name like #{name}
+        </where>
+    </select>
+    <select id="queryStudentsLikes" parameterType="map" resultType="map">
+        SELECT no,
+        department.name departmentName,
+        level,
+        direction.name directionName,classes.name classesName,no,student.name studentName
+        FROM t_student student
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_department) department ON department.id = student.department_id
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_direction) direction ON direction.id = student.direction_id
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_classes) classes ON classes.id = student.classes_id
+        <where>
+            <if test="departmentId!=''">
+                department_id = #{departmentId}
+            </if>
+            <if test="level!=''">
+                AND level = #{level}
+            </if>
+            <if test="directionId!=''">
+                AND direction_id = #{directionId}
+            </if>
+            <if test="classesId!=''">
+                AND  student.classes_id = #{classesId}
+            </if>
+            AND student.no LIKE #{no}
+            and student.name like #{name}
+        </where>
+        limit #{start},#{pageSize}
+    </select>
+    <select id="queryStudentByNo" parameterType="string" resultType="map">
+        SELECT
+            no,
+            head_image,
+            student.name    studentName,
+            gender,
+            famous.para_dispname famousFamily,
+            native_place,
+            political_status,
+            idcard,
+            profession.name professionName,
+            direction.name  directionName,
+            in_school,
+            direction_id,
+            department_id,
+            student.level,
+            student.student_contact_method phone
+        FROM t_student student
+            LEFT JOIN (SELECT
+                           para_no,
+                           para_dispname
+                       FROM t_famous_family) famous ON famous.para_no = student.famous_family
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_profession) profession ON profession.id = student.profession_id
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_direction) direction ON direction.id = student.direction_id
+        WHERE no = #{no}
+    </select>
+    <select id="queryStudentCourseResultByNo" parameterType="string" resultType="map">
+        SELECT
+            test_entry_time testTime,
+            nature,
+            course_name     courseName,
+            credit,
+            score,
+            is_pass
+        FROM t_result
+        WHERE no = #{no} ORDER BY is_pass DESC,nature ASC,testTime ASC
+    </select>
+    <select id="queryTotalCredits" parameterType="map" resultType="int">
+        SELECT school_score score FROM t_train_program module
+        LEFT JOIN (SELECT cource_id,program_id FROM t_program_module_course) mcourse on module.id = mcourse.program_id
+        LEFT JOIN (SELECT id,school_score,nature FROM t_course) course on course.id = mcourse.cource_id and course.nature="必修"
+        WHERE module.department_id = #{department_id}
+        and module.direction_id = #{direction_id}
+        and module.level = #{level}
+    </select>
+</mapper>

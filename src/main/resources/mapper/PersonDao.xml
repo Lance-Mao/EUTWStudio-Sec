@@ -1,0 +1,1292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.PersonDao">
+    <select id="queryPersonTotalCount" resultType="long">
+        SELECT count(1)
+        FROM t_teacher
+    </select>
+    <delete id="deleteTeacherById" parameterType="string">
+        DELETE FROM t_teacher
+        WHERE no = #{id}
+    </delete>
+    <insert id="addTeacher" parameterType="Teacher">
+        INSERT INTO t_teacher (no, name, department_id, direction_id, gender, dept_id, classify, identityCard)
+        VALUES (#{no}, #{name}, #{departmentId}, #{directionId}, #{gender}, #{deptId}, #{classify}, #{identityCard})
+    </insert>
+
+    <update id="updateTeacher" parameterType="Teacher">
+        UPDATE t_teacher
+        SET name      = #{name}, department_id = #{departmentId}, direction_id = #{directionId}, gender = #{gender}
+            , dept_id = #{deptId}, classify = #{classify}
+        WHERE no = #{no}
+    </update>
+    <select id="queryStudentsByLikes" parameterType="map" resultType="map">
+        SELECT student.no,student.name,student.gender,direction.name direction,profession.name profession,class.name
+        classes,teacher.department_id departmentId,classes.name classesName
+        FROM t_student student
+        LEFT JOIN (SELECT no, department_id FROM t_teacher) teacher ON teacher.no = #{no}
+        LEFT JOIN (SELECT id FROM t_department) department ON department.id = teacher.department_id
+        LEFT JOIN (SELECT id, name FROM t_direction) direction ON direction.id = student.direction_id
+        LEFT JOIN (SELECT id,name FROM t_classes) classes ON classes.id = student.classes_id
+        LEFT JOIN (SELECT id, name FROM t_classes) class ON class.id = student.classes_id
+        <where>
+            <if test="level!=''">
+                student.level = ${level}
+            </if>
+            and student.no LIKE #{studentNo}
+            and student.department_id = teacher.department_id
+            <if test="directionId!=''">
+                and direction_id =#{directionId}
+            </if>
+            <if test="professionId!=''">
+                AND profession.id = #{professionId}
+            </if>
+            <if test="classesId!=''">
+                AND student.classes_id = #{classesId}
+            </if>
+            and student.name
+
+            LIKE #{name}
+        </where>
+    </select>
+    <select id="queryStudentsByLikesAdmin" parameterType="map" resultType="map">
+        SELECT student.no,student.name,student.gender,direction.name direction,profession.name profession,classes.name
+        classesName
+        FROM t_student student
+        LEFT JOIN (SELECT id, name FROM t_direction) direction ON direction.id = student.direction_id
+
+        LEFT JOIN (SELECT id,name FROM t_profession) profession ON profession.id = student.profession_id
+        LEFT JOIN (SELECT id,name FROM t_classes) classes ON classes.id = student.classes_id
+
+        <where>
+
+            <if test="level!=''">
+                and student.level = ${level}
+            </if>
+            and student.no LIKE #{studentNo}
+            <if test="directionId!=''">
+                and direction_id =#{directionId}
+            </if>
+            <if test="professionId!=''">
+                AND profession.id = #{professionId}
+            </if>
+            <if test="classesId!=''">
+                AND student.classes_id = #{classesId}
+            </if>
+            and student.name
+
+            LIKE #{name}
+        </where>
+    </select>
+
+    <select id="queryStudentList" resultType="map" parameterType="map">
+        SELECT
+        student.no,
+        student.name,
+        student.gender,
+        student.level,
+        student.stay_type,
+        student.student_status,
+        student.teacher_id,
+        student.community_teacher_id,
+        department.name department,
+        profession.name profession,
+        direction.name direction,
+        class.name classes,
+        area.name area,
+        floor.name floor,
+        room.name room,
+        teacher.name teacher_name,
+        teacherCommunity.name community_teacher_name
+        FROM t_student student
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_department) department ON department.id = student.department_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_direction) direction ON direction.id = student.direction_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_profession) profession ON profession.id = student.profession_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_classes) class ON class.id = student.classes_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_area) area ON area.id = student.area_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_floor) floor ON floor.id = student.floor_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_room) room ON room.id = student.room_id
+        LEFT JOIN (SELECT
+        t_teacher.no,
+        name,
+        gender
+        FROM t_teacher) teacher ON teacher.no = student.teacher_id
+        LEFT JOIN (SELECT
+        t_teacher.no,
+        name,
+        gender
+        FROM t_teacher) teacherCommunity ON teacherCommunity.no = student.community_teacher_id
+
+        WHERE
+
+        student.name LIKE #{searchDto.name}
+        and student.no LIKE #{searchDto.studentNo}
+        and student.gender LIKE #{searchDto.sex}
+
+
+        <if test=" searchDto.classesId !=''">
+            and student.classes_id LIKE #{searchDto.classesId}
+        </if>
+
+
+        <if test=" searchDto.level != ''">
+            and student.level = #{searchDto.level}
+        </if>
+
+        <if test=" searchDto.departmentId !=''">
+            and student.department_id = #{searchDto.departmentId}
+        </if>
+
+        <if test=" searchDto.directionId !=''">
+            and student.direction_id = #{searchDto.directionId}
+        </if>
+        <if test=" searchDto.professionId !=''">
+            and student.profession_id = #{searchDto.professionId}
+        </if>
+
+        <if test=" searchDto.teacherId !=''">
+            and student.teacher_id = #{searchDto.teacherId}
+        </if>
+
+        <if test=" searchDto.communityTeacherId !=''">
+            and student.community_teacher_id = #{searchDto.communityTeacherId}
+        </if>
+
+        <if test=" searchDto.TypeOfAccommodation != ''">
+            and student.stay_type = #{searchDto.TypeOfAccommodation}
+        </if>
+        <if test=" searchDto.studentStatusSearch != ''">
+            and student.student_status = #{searchDto.studentStatusSearch}
+        </if>
+
+        <if test=" searchDto.areaId !=''">
+            <if test="searchDto.TypeOfAccommodation == 1">
+                and student.area_id = #{searchDto.areaId}
+            </if>
+        </if>
+        <if test=" searchDto.floorId !=''">
+            <if test="searchDto.TypeOfAccommodation == 1">
+                and student.floor_id = #{searchDto.floorId}
+            </if>
+        </if>
+        <if test=" searchDto.roomId !=''">
+            <if test="searchDto.TypeOfAccommodation == 1">
+                and room.name LIKE #{searchDto.roomId}
+            </if>
+        </if>
+        ORDER BY department.id DESC,level DESC ,profession.id ASC,direction.id DESC,class.id ASC
+        limit #{start},#{pageSize};
+    </select>
+    <select id="queryStudentsListCount" resultType="long">
+        SELECT count(*)
+        FROM t_student student
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_department) department ON department.id = student.department_id
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_direction) direction ON direction.id = student.direction_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_profession) profession ON profession.id = student.profession_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_classes) class ON class.id = student.classes_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_area) area ON area.id = student.area_id
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_floor) floor ON floor.id = student.floor_id
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_room) room ON room.id = student.room_id
+        WHERE
+        # department_id = department.id
+        # AND direction_id = direction.id
+        # AND profession_id = profession.id
+
+        # and
+        student.name LIKE #{searchDto.name}
+        and student.no LIKE #{searchDto.studentNo}
+        and student.gender LIKE #{searchDto.sex}
+        <if test=" searchDto.classesId !=''">
+            and student.classes_id LIKE #{searchDto.classesId}
+        </if>
+
+        <if test=" searchDto.departmentId !=''">
+            and student.department_id = #{searchDto.departmentId}
+        </if>
+
+        <if test=" searchDto.TypeOfAccommodation != ''">
+            and student.stay_type = #{searchDto.TypeOfAccommodation}
+        </if>
+
+        <if test=" searchDto.professionId !=''">
+            and student.profession_id = #{searchDto.professionId}
+        </if>
+
+        <if test=" searchDto.studentStatusSearch != ''">
+            and student.student_status = #{searchDto.studentStatusSearch}
+        </if>
+
+        <if test=" searchDto.teacherId !=''">
+            and student.teacher_id = #{searchDto.teacherId}
+        </if>
+
+        <if test=" searchDto.communityTeacherId !=''">
+            and student.community_teacher_id = #{searchDto.communityTeacherId}
+        </if>
+
+        <if test=" searchDto.level != ''">
+            and student.level = #{searchDto.level}
+        </if>
+
+        <if test=" searchDto.directionId !=''">
+            and student.direction_id = #{searchDto.directionId}
+        </if>
+
+
+        <if test="searchDto.TypeOfAccommodation == 1">
+            <if test=" searchDto.areaId !=''">
+                and student.area_id = #{searchDto.areaId}
+            </if>
+            <if test=" searchDto.floorId !=''">
+                and student.floor_id = #{searchDto.floorId}
+            </if>
+            <if test=" searchDto.roomId !=''">
+                and room.name LIKE #{searchDto.roomId}
+            </if>
+        </if>
+
+    </select>
+    <select id="queryStudentsByClassesIdsAndLikeName" resultType="map" parameterType="map">
+        SELECT
+        student.no,
+        student.name,
+        student.gender,
+        student.level,
+        student.stay_type,
+        student.student_status,
+        student.teacher_id,
+        student.community_teacher_id,
+        department.name department,
+        profession.name profession,
+        direction.name direction,
+        class.name classes,
+        area.name area,
+        floor.name floor,
+        room.name room,
+        teacher.name teacher_name,
+        teacherCommunity.name community_teacher_name
+        FROM t_student student
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_department) department ON department.id = student.department_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_direction) direction ON direction.id = student.direction_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_profession) profession ON profession.id = student.profession_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_classes) class ON class.id = student.classes_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_area) area ON area.id = student.area_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_floor) floor ON floor.id = student.floor_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_room) room ON room.id = student.room_id
+        LEFT JOIN (SELECT
+        t_teacher.no,
+        name,
+        gender
+        FROM t_teacher) teacher ON teacher.no = student.teacher_id
+        LEFT JOIN (SELECT
+        t_teacher.no,
+        name,
+        gender
+        FROM t_teacher) teacherCommunity ON teacherCommunity.no = student.community_teacher_id
+
+        <where>
+            student.name LIKE #{searchDto.name}
+            and student.no LIKE #{searchDto.studentNo}
+            <if test="searchDto.classesId !='' and searchDto.classesId != null">
+                and student.classes_id LIKE #{searchDto.classesId}
+            </if>
+            <if test="searchDto.departmentId !='' and searchDto.departmentId != null">
+                and student.department_id = #{searchDto.departmentId}
+            </if>
+            <if test="searchDto.professionId !='' and searchDto.professionId != null">
+                and student.level = #{searchDto.professionId}
+            </if>
+            <if test="searchDto.directionId !='' and searchDto.directionId != null">
+                and student.direction_id = #{searchDto.directionId}
+            </if>
+
+            <if test="searchDto.areaId !='' and searchDto.areaId !=null">
+                and student.area_id = #{searchDto.areaId}
+            </if>
+            <if test="searchDto.floorId !='' and searchDto.floorId != null">
+                and student.floor_id = #{searchDto.floorId}
+            </if>
+            <if test="searchDto.roomId !='' and searchDto.roomId != null">
+                and student.room_id = #{searchDto.roomId}
+            </if>
+
+        </where>
+        ORDER BY department.id DESC,level DESC ,profession.id ASC,direction.id DESC,class.id ASC
+        LIMIT #{start}, #{pageSize}
+
+    </select>
+    <select id="queryStudentsCount" resultType="long">
+        SELECT count(*)
+        FROM t_student student
+
+        WHERE
+        student.name LIKE #{searchDto.name}
+        and student.no LIKE #{searchDto.studentNo}
+        <if test=" searchDto.classesId !=''">
+            and student.classes_id LIKE #{searchDto.classesId}
+        </if>
+        <if test=" searchDto.departmentId !=''">
+            and student.department_id = #{searchDto.departmentId}
+        </if>
+        <if test=" searchDto.professionId !=''">
+            and student.level = #{searchDto.professionId}
+        </if>
+        <if test=" searchDto.directionId !=''">
+            and student.direction_id = #{searchDto.directionId}
+        </if>
+        <if test=" searchDto.areaId !=''">
+            and student.area_id = #{searchDto.areaId}
+        </if>
+        <if test=" searchDto.floorId !=''">
+            and student.floor_id = #{searchDto.floorId}
+        </if>
+        <if test="searchDto.roomId !='' and searchDto.roomId != null">
+            and student.room_id = #{searchDto.roomId}
+        </if>
+
+    </select>
+    <select id="queryStudentByNo" parameterType="string" resultType="Student">
+        SELECT *
+        FROM t_student
+        WHERE no = #{stuNo}
+    </select>
+    <select id="queryPersonList" resultType="Map">
+        SELECT
+        teacher.no,
+        teacher.name,
+        teacher.gender,
+        teacher.classify,
+        teacher.identityCard,
+        department.id departmentId,
+        department.name departmentName,
+        direction.id directionId,
+        direction.name directionName,
+        dept.id deptId,
+        dept.name deptName
+
+        FROM t_teacher teacher
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_department) department ON department.id = teacher.department_id
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_direction) direction ON direction.id = teacher.direction_id
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_dept) dept ON dept.id = teacher.dept_id
+        LIMIT #{start}, #{end}
+    </select>
+
+    <select id="queryTeacherByNo" parameterType="string" resultType="map">
+        SELECT *
+        FROM t_teacher
+        WHERE no = #{no}
+    </select>
+    <update id="distributedClass">
+        UPDATE t_student SET classes_id = #{classesId} WHERE t_student.no IN
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+    <update id="distributeDirection">
+        UPDATE t_student SET direction_id=#{directionId} WHERE no IN
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </update>
+    <select id="updateStudentTeacherId">
+        UPDATE t_student SET teacher_id=#{teacherId} WHERE no IN
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+    <insert id="addCommunication" parameterType="CommunicationContent">
+        INSERT INTO t_communication (teacher_id, student_id, talk_name, direction, content,communicationPhone,communicationMode) VALUES
+        (#{teacherId}, #{studentId}, #{talkName}, #{direction}, #{content},#{communicationPhone},#{communicationMode})
+    </insert>
+    <select id="queryCommunicationByStudentId" parameterType="string" resultType="map">
+
+        SELECT
+            id,
+            teacher.name teacherName,
+            talk_name    talkName,
+            content,
+            time,
+            direction,
+            communicationPhone,
+            communicationMode
+        FROM t_communication communication
+            LEFT JOIN (SELECT
+                           no,
+                           name
+                       FROM t_teacher) teacher ON teacher.no = communication.teacher_id
+        WHERE communication.student_id = #{studentNo}
+        ORDER BY time DESC
+    </select>
+
+
+    <update id="updateCommunicationContent" parameterType="CommunicationContent">
+        UPDATE t_communication
+        SET content = #{content}
+        WHERE id = #{id}
+    </update>
+
+
+    <select id="queryStudentTotalCount" parameterType="map" resultType="long">
+        SELECT count(*)
+        FROM t_student student
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_room) room ON room.id = student.room_id
+
+        WHERE
+        student.name LIKE #{searchDto.name}
+        and student.no LIKE #{searchDto.studentNo}
+        <if test=" searchDto.classesId !=''">
+            and student.classes_id LIKE #{searchDto.classesId}
+        </if>
+        <if test=" searchDto.departmentId !=''">
+            and student.department_id = #{searchDto.departmentId}
+        </if>
+        <if test=" searchDto.professionId !=''">
+            and student.level = #{searchDto.professionId}
+        </if>
+        <if test=" searchDto.directionId !=''">
+            and student.direction_id = #{searchDto.directionId}
+        </if>
+        <if test=" searchDto.areaId !=''">
+            and student.area_id = #{searchDto.areaId}
+        </if>
+        <if test=" searchDto.floorId !=''">
+            and student.floor_id = #{searchDto.floorId}
+        </if>
+        <if test=" searchDto.roomId !=''">
+            and room.name LIKE #{searchDto.roomId}
+        </if>
+    </select>
+
+
+    <select id="queryAllDept" parameterType="map" resultType="map">
+        select * from t_dept
+        limit #{start},#{pageSize};
+    </select>
+
+    <select id="queryDeptTotalCount" resultType="long">
+        select COUNT(*) from t_dept;
+    </select>
+
+    <insert id="addDept" parameterType="map">
+        INSERT INTO t_dept(name)
+        VALUES (#{name})
+    </insert>
+
+    <update id="updateDept" parameterType="map">
+        UPDATE t_dept
+        SET name = #{name}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteDept" parameterType="string">
+        DELETE FROM t_dept
+        WHERE id = #{id}
+    </delete>
+
+    <select id="queryUserById" resultType="Teacher" parameterType="string">
+        SELECT *
+        FROM t_teacher
+        WHERE no = #{no}
+    </select>
+    <select id="queryDirectionByDepartmentId" resultType="Direction" parameterType="int">
+        select * from t_direction
+        WHERE department_id = #{departmentId}
+    </select>
+    <select id="queryDirectionByDepartment" resultType="Direction">
+        select * from t_direction
+    </select>
+    <select id="queryClass" resultType="Classes">
+        select * from t_classes
+    </select>
+    <select id="queryClassByDepartmentId" resultType="Classes" parameterType="int">
+        select * from t_classes
+        WHERE department_id = #{departmentId}
+    </select>
+
+    <select id="queryStudentInfoById" resultType="map" parameterType="String">
+        SELECT
+            student.no,
+            student.name,
+            student.gender,
+            student.native_place,
+            student.idcard,
+            student.level,
+            student.political_status,
+            classes.name classesName,
+            department.name department,
+            direction.name  direction,
+            famousFamily.para_dispname famousFamily,
+            profession.name profession
+        FROM t_student student
+            LEFT JOIN (SELECT
+                           para_no,
+                           para_dispname
+                       FROM t_famous_family) famousFamily ON famousFamily.para_no = student.famous_family
+            LEFT JOIN (SELECT id,name from t_classes) classes on classes.id = student.classes_id
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_department) department ON department.id = student.department_id
+
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_direction) direction ON direction.id = student.direction_id
+
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_profession) profession ON profession.id = student.profession_id
+
+
+        WHERE student.no = #{studentNo}
+    </select>
+
+    <select id="updateByStudentNo" parameterType="String" resultType="map">
+
+        SELECT
+  student.*,
+  direction.name direction,
+  profession.name profession,
+  class.name classes,
+  department.name department,
+  area.name area,
+  floor.name floor,
+  room.name room,
+  teacher.name teacherName,
+  teacherCommunity.name teacherCommunity,
+  famousFamily.para_dispname famousFamily,
+  origin_profession.name originProfession
+
+FROM t_student student
+
+
+  LEFT JOIN (SELECT
+               t_teacher.no,
+               name,
+               gender
+             FROM t_teacher) teacher ON teacher.no = student.teacher_id
+  LEFT JOIN (SELECT
+               t_teacher.no,
+               name,
+               gender
+             FROM t_teacher) teacherCommunity ON teacherCommunity.no = student.community_teacher_id
+
+  LEFT JOIN (SELECT
+               id,
+               name
+             FROM t_department) department ON department.id = student.department_id
+  LEFT JOIN (SELECT
+               id,
+               name
+             FROM t_direction) direction ON direction.id = student.direction_id
+
+  LEFT JOIN (SELECT
+               id,
+               name
+             FROM t_profession) profession ON profession.id = student.profession_id
+  LEFT JOIN (SELECT
+               id,
+               name
+             FROM t_profession) origin_profession ON origin_profession.id = student.origin_profession_id
+
+  LEFT JOIN (SELECT
+               id,
+               name
+             FROM t_classes) class ON class.id = student.classes_id
+
+  LEFT JOIN (SELECT
+               id,
+               name
+             FROM t_area) area ON area.id = student.area_id
+  LEFT JOIN (SELECT
+               id,
+               name
+             FROM t_floor) floor ON floor.id = student.floor_id
+  LEFT JOIN (SELECT
+               id,
+               name
+             FROM t_room) room ON room.id = student.room_id
+  LEFT JOIN (SELECT
+               para_no,
+               para_dispname
+             FROM t_famous_family) famousFamily ON famousFamily.para_no = student.famous_family
+WHERE student.no =#{studentNo}
+    </select>
+    <select id="queryOwnPunishmentByStudentNo" parameterType="String" resultType="map">
+          SELECT * FROM t_own_punishment where studentNo=#{studentNo}
+    </select>
+    <select id="queryDisciplineAndPunishmentByStudentNo" parameterType="String" resultType="map">
+        SELECT * FROM t_discipline_and_punishment where studentNo=#{studentNo}
+    </select>
+    <select id="queryGroupActivitiesByStudentNo" parameterType="String" resultType="map">
+        SELECT * FROM t_group_activities where studentNo=#{studentNo}
+    </select>
+    <select id="updateFamilyByStudentNo" parameterType="String" resultType="map">
+        SELECT family.*
+        FROM t_student_family family
+        WHERE family.no = #{studentNo}
+    </select>
+    <select id="updateExperienceByStudentNo" parameterType="String" resultType="map">
+        SELECT
+        experience.*
+        FROM t_student_experience experience
+        WHERE experience.no =#{studentNo}
+
+    </select>
+
+    <select id="queryStudentsToUpdate" parameterType="string" resultType="map">
+        SELECT *
+        FROM t_student
+        WHERE t_student.no = #{studentNo}
+    </select>
+    <select id="queryStudentFamily" parameterType="string" resultType="map">
+        select * from t_student_family
+        WHERE t_student_family.no = #{studentNo}
+    </select>
+    <select id="queryStudentsProfessionList" resultType="map">
+        select * from t_profession
+        WHERE department_id  = #{departmentId}
+    </select>
+    <select id="queryStudentsDirection" resultType="map">
+        SELECT *
+        FROM t_direction
+        WHERE department_id = #{departmentId}
+    </select>
+    <select id="queryStudentsClassList" resultType="map">
+        select * from t_classes
+        WHERE level = #{searchLevel}
+    </select>
+    <select id="queryStudentExperienceList" resultType="map">
+        select * from t_student_experience
+        WHERE no = #{studentNo}
+    </select>
+    <select id="queryStudentScholarshipsList" resultType="map">
+        select * from t_scholarships
+        WHERE no = #{studentNo}
+    </select>
+
+    <insert id="insertCommunityTeacher">
+        INSERT t_teacher_community (no,area_id,floor_id) VALUES
+        <foreach collection="floorId" item="item" index="index" separator=",">
+            (#{no},#{areaId},#{item})
+        </foreach>
+    </insert>
+
+    <select id="queryTeacherCommunity" resultType="map">
+        select * from t_teacher_community
+
+        where no=#{no}
+    </select>
+    <select id="teacherCommunity" resultType="map">
+        SELECT area_id
+        FROM t_teacher_community
+
+        WHERE no = #{no}
+    </select>
+    <select id="teacherCommunity_floors" resultType="map">
+        select floor_id from t_teacher_community
+
+        where no=#{no}
+    </select>
+    <select id="queryTeacherList" resultType="map">
+        select * from t_teacher
+    </select>
+
+    <insert id="addFamilyByUpdate" parameterType="com.thoughtWorks.entity.StudentFamily">
+        insert into t_student_family (no,relationship,name,political_status,staff,work_place,phone) values
+        (#{no},#{relationship},#{name},#{political_status},#{staff},#{work_place},#{phone});
+    </insert>
+    <update id="updateStudentList" parameterType="com.thoughtWorks.entity.StudentUpdate">
+        UPDATE t_student
+        <set>
+            <if test="classes_id != null ">
+                t_student.classes_id = #{classes_id},
+            </if>
+
+            <if test="origin_profession_id != null ">
+                t_student.origin_profession_id = #{origin_profession_id},
+            </if>
+            <if test="direction_id != null ">
+                t_student.direction_id = #{direction_id},
+            </if>
+            <if test="head_image != null ">
+                t_student.head_image = #{head_image},
+            </if>
+
+            <if test="health_status != null ">
+                t_student.health_status = #{health_status},
+            </if>
+            <if test="student_type != null ">
+                t_student.student_type = #{student_type},
+            </if>
+            <if test="stay_type != null ">
+                t_student.stay_type = #{stay_type},
+            </if>
+            <if test="in_school != null ">
+                t_student.in_school = #{in_school},
+            </if>
+            <if test="graduate_school != null ">
+                t_student.graduate_school = #{graduate_school},
+            </if>
+            <if test="blood != null  ">
+                t_student.blood = #{blood},
+            </if>
+            <if test="height != null and height != ''">
+                t_student.height = #{height},
+            </if>
+            <if test="born != null ">
+                t_student.born = #{born},
+            </if>
+            <if test="is_marry != null ">
+                t_student.is_marry = #{is_marry},
+            </if>
+            <if test="weight != null and weight != ''">
+                t_student.weight = #{weight},
+            </if>
+            <if test="political_status != null ">
+                t_student.political_status = #{political_status},
+            </if>
+            <if test="pre_school_education != null ">
+                t_student.pre_school_education = #{pre_school_education},
+            </if>
+            <if test="student_classify != null ">
+                t_student.student_classify = #{student_classify},
+            </if>
+            <if test="idcard_address != null ">
+                t_student.idcard_address = #{idcard_address},
+            </if>
+            <if test="actual_address != null ">
+                t_student.actual_address = #{actual_address},
+            </if>
+            <if test="origin_address != null ">
+                t_student.origin_address = #{origin_address},
+            </if>
+            <if test="family_phone != null ">
+                t_student.family_phone = #{family_phone},
+            </if>
+            <if test="family_zip_code != null ">
+                t_student.family_zip_code = #{family_zip_code},
+            </if>
+            <if test="famous_family != null ">
+                t_student.famous_family = #{famous_family},
+            </if>
+            <if test="student_contact_method != null ">
+                t_student.student_contact_method = #{student_contact_method},
+            </if>
+            <if test="emergency_contact_name != null ">
+                t_student.emergency_contact_name = #{emergency_contact_name},
+            </if>
+            <if test="emergency_contact_method != null ">
+                t_student.emergency_contact_method = #{emergency_contact_method},
+            </if>
+            <if test="account_in != null ">
+                t_student.account_in = #{account_in},
+            </if>
+            <if test="email != null ">
+                t_student.email = #{email},
+            </if>
+            <if test="qq != null ">
+                t_student.qq = #{qq},
+            </if>
+            <if test="department_id != null ">
+                t_student.department_id = #{department_id},
+            </if>
+            <if test="native_place != null ">
+                t_student.native_place = #{native_place},
+            </if>
+            <if test="area_origin_name != null ">
+                t_student.area_origin_name = #{area_origin_name},
+            </if>
+            <if test="sat_score != null  ">
+                t_student.sat_score = #{sat_score},
+            </if>
+            <if test="pre_school_file_where_location != null ">
+                t_student.pre_school_file_where_location = #{pre_school_file_where_location},
+            </if>
+            <if test="file_in != null ">
+                t_student.file_in = #{file_in},
+            </if>
+            <if test="otherHealthStatus!= null ">
+                t_student.otherHealthStatus = #{otherHealthStatus},
+            </if>
+            <if test="pre_school_name != null ">
+                t_student.pre_school_name = #{pre_school_name},
+            </if>
+            <if test="pre_school_account_where_station != null ">
+                t_student.pre_school_account_where_station = #{pre_school_account_where_station},
+            </if>
+            <if test="pre_school_work != null ">
+                t_student.pre_school_work = #{pre_school_work},
+            </if>
+            <if test="units_or_projects_practical_type != null ">
+                t_student.units_or_projects_practical_type = #{units_or_projects_practical_type},
+            </if>
+            <if test="units_or_projects_practical_type_contact != null ">
+                t_student.units_or_projects_practical_type_contact = #{units_or_projects_practical_type_contact},
+            </if>
+            <if test="units_or_projects_practical_type_contact_phone != null ">
+                t_student.units_or_projects_practical_type_contact_phone = #{units_or_projects_practical_type_contact_phone},
+            </if>
+            <if test="group != null ">
+                t_student.group = #{group},
+            </if>
+            <if test="pre_school_staff != null ">
+                t_student.pre_school_staff = #{pre_school_staff},
+            </if>
+            <if test="own_experience != null ">
+                t_student.own_experience = #{own_experience},
+            </if>
+            <if test="own_punishment != null ">
+                t_student.own_punishment = #{own_punishment},
+            </if>
+            <if test="student_status != null ">
+                t_student.student_status = #{student_status},
+            </if>
+            <if test="payment_status_first_year != null ">
+                t_student.payment_status_first_year = #{payment_status_first_year},
+            </if>
+            <if test="arrears_first_year != null ">
+                t_student.arrears_first_year = #{arrears_first_year},
+            </if>
+            <if test="payment_status_second_year != null ">
+                t_student.payment_status_second_year = #{payment_status_second_year},
+            </if>
+            <if test="arrears_second_year != null ">
+                t_student.arrears_second_year = #{arrears_second_year},
+            </if>
+            <if test="payment_status_third_year != null ">
+                t_student.payment_status_third_year = #{payment_status_third_year},
+            </if>
+            <if test="arrears_forth_year != null ">
+                t_student.arrears_forth_year = #{arrears_forth_year},
+            </if>
+            <if test="payment_status_forth_year != null ">
+                t_student.payment_status_forth_year = #{payment_status_forth_year},
+            </if>
+            <if test="payment_status_fifth_year != null ">
+                t_student.payment_status_fifth_year = #{payment_status_fifth_year},
+            </if>
+            <if test="arrears_third_year != null ">
+                t_student.arrears_third_year = #{arrears_third_year},
+            </if>
+            <if test="arrears_fifth_year != null ">
+                t_student.arrears_fifth_year = #{arrears_fifth_year},
+            </if>
+            <if test="arrears_sixth_year != null ">
+                t_student.arrears_sixth_year = #{arrears_sixth_year},
+            </if>
+            <if test="payment_status_sixth_year != null ">
+                t_student.payment_status_sixth_year = #{payment_status_sixth_year},
+            </if>
+            <if test="practice_learning_type != null ">
+                t_student.practice_learning_type = #{practice_learning_type},
+            </if>
+            <if test="off_school_stay_address != null ">
+                t_student.off_school_stay_address = #{off_school_stay_address},
+            </if>
+            <if test="updateOffCampusContactPhone != null ">
+                t_student.updateOffCampusContactPhone = #{updateOffCampusContactPhone},
+            </if>
+            <if test="updateOffCampusContactName != null ">
+                t_student.updateOffCampusContactName = #{updateOffCampusContactName},
+            </if>
+            <if test="area_id != null ">
+                t_student.area_id = #{area_id},
+            </if>
+            <if test="floor_id != null ">
+                t_student.floor_id = #{floor_id},
+            </if>
+            <if test="room_id != null ">
+                t_student.room_id = #{room_id},
+            </if>
+            <if test="counselor_id != null ">
+                t_student.counselor_id = #{counselor_id},
+            </if>
+            <if test="is_out != null ">
+                t_student.is_out = #{is_out},
+            </if>
+            <if test="religion != null ">
+                t_student.religion = #{religion},
+            </if>
+            <if test="religionText != null ">
+                t_student.religionText = #{religionText},
+            </if>
+            <if test="Pre_admissionOrReward != null ">
+                t_student.Pre_admissionOrReward = #{Pre_admissionOrReward},
+            </if>
+            <if test="Pre_admissionOrRewardText != null ">
+                t_student.Pre_admissionOrRewardText = #{Pre_admissionOrRewardText},
+            </if>
+            <if test="partyOrGroupOrganization != null ">
+                t_student.partyOrGroupOrganization = #{partyOrGroupOrganization},
+            </if>
+            <if test="partyOrGroupOrganizationText != null ">
+                t_student.partyOrGroupOrganizationText = #{partyOrGroupOrganizationText},
+            </if>
+            <if test="hard_type != null ">
+                t_student.hard_type = #{hard_type},
+            </if>
+            <if test="teacher_id != null ">
+                t_student.teacher_id = #{teacher_id},
+            </if>
+            <if test="community_teacher_id != null ">
+                t_student.community_teacher_id = #{community_teacher_id},
+            </if>
+            <if test="first_scholarship != null ">
+                t_student.first_scholarship = #{first_scholarship},
+            </if>
+            <if test="first_year != null ">
+                t_student.first_year = #{first_year},
+            </if>
+            <if test="first_stipend != null ">
+                t_student.first_stipend = #{first_stipend},
+            </if>
+            <if test="second_year != null ">
+                t_student.second_year = #{second_year},
+            </if>
+            <if test="second_scholarship != null ">
+                t_student.second_scholarship = #{second_scholarship},
+            </if>
+            <if test="second_stipend != null ">
+                t_student.second_stipend = #{second_stipend},
+            </if>
+            <if test="third_scholarship != null ">
+                t_student.third_scholarship = #{third_scholarship},
+            </if>
+            <if test="third_year != null ">
+                t_student.third_year = #{third_year},
+            </if>
+            <if test="third_stipend != null ">
+                t_student.third_stipend = #{third_stipend},
+            </if>
+            <if test="first_time_medical_insurance != null ">
+                            t_student.first_time_medical_insurance = #{first_time_medical_insurance},
+                        </if>
+            <if test="second_time_medical_insurance != null ">
+                            t_student.second_time_medical_insurance = #{second_time_medical_insurance},
+                        </if>
+            <if test="third_time_medical_insurance != null ">
+                            t_student.third_time_medical_insurance = #{third_time_medical_insurance},
+                        </if>
+            <if test="first_medical_insurance != null ">
+                            t_student.first_medical_insurance = #{first_medical_insurance},
+                        </if>
+            <if test="second_medical_insurance != null ">
+                            t_student.second_medical_insurance = #{second_medical_insurance},
+                        </if>
+            <if test="third_medical_insurance != null ">
+                            t_student.third_medical_insurance = #{third_medical_insurance}
+            </if>
+
+        </set>
+        WHERE t_student.no = #{no}
+    </update>
+
+    <update id="updateFamilyInfo" parameterType="map">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE t_student_family family
+            <set>
+                <if test="item.updateStudentParentsNameList != null">
+                    family.name = #{item.updateStudentParentsNameList},
+                </if>
+
+                <if test="item.updateStudentParent_political_statusList != null">
+                    family.political_status = #{item.updateStudentParent_political_statusList},
+                </if>
+                <if test="item.updateStudentParent_dutiesList != null">
+                    family.staff = #{item.updateStudentParent_dutiesList},
+                </if>
+                <if test="item.updateStudentParent_employerList != null">
+                    family.work_place = #{item.updateStudentParent_employerList},
+                </if>
+                <if test="item.updateStudentParent_phoneList != null">
+                    family.phone = #{item.updateStudentParent_phoneList},
+                </if>
+            </set>
+            WHERE family.id = #{item.updateStudentParentIds}
+        </foreach>
+    </update>
+
+    <update id="updateExperienceList" parameterType="map">
+        <foreach collection="experiences" item="item" index="index" open="" close="" separator=";">
+            UPDATE t_student_experience
+            <set>
+                <if test="item.update_duties_start_list != null">
+                    t_student_experience.staff = #{item.update_duties_start_list},
+                </if>
+                <if test="item.educational_experience_start_list != null">
+                    t_student_experience.start_time = #{item.educational_experience_start_list},
+                </if>
+                <if test="item.educational_experience_end_list != null">
+                    t_student_experience.end_time = #{item.educational_experience_end_list},
+                </if>
+                <if test="item.update_schoolName_list != null">
+                    t_student_experience.work_place = #{item.update_schoolName_list}
+                </if>
+            </set>
+            WHERE t_student_experience.id = #{item.experienceIds}
+        </foreach>
+    </update>
+
+    <select id="addTeacherToUser">
+        INSERT INTO t_user (username,password,roleId,available,name,staff)
+        VALUES (#{teacher.no},#{teacher.identityCard},#{roleId},1,#{teacher.name},#{teacher.classify})
+    </select>
+
+    <delete id="deleteUserByTeacherId" parameterType="string">
+        DELETE FROM t_user
+        WHERE username = #{id}
+    </delete>
+
+    <delete id="delStudentFamily" parameterType="string">
+        DELETE FROM t_student_family
+        WHERE id = #{familyId}
+    </delete>
+
+    <delete id="delExperience" parameterType="string">
+        DELETE FROM t_student_experience
+        WHERE id = #{experienceId}
+    </delete>
+    <delete id="delAward" parameterType="string">
+        DELETE FROM t_own_punishment
+        WHERE id = #{experienceId}
+    </delete>
+
+    <insert id="addExperienceByUpdate" parameterType="com.thoughtWorks.entity.Experience">
+        insert into t_student_experience (start_time,end_time,work_place,staff,no)
+        values (#{start_time},#{end_time},#{work_place},#{staff},#{no});
+    </insert>
+
+    <select id="queryFamousFamily" resultType="map">
+        SELECT *
+        FROM t_famous_family
+        WHERE para_no = #{famousFamily}
+    </select>
+
+    <select id="queryDepartmentList" resultType="map">
+        select * from t_department
+    </select>
+
+    <select id="showAutoClassByDepartment" parameterType="string" resultType="map">
+        select * from t_classes
+        WHERE department_id = #{departmentId}
+        AND level = #{searchLevel}
+    </select>
+
+    <select id="queryStudentNameByStudentNo" resultType="string" parameterType="string">
+        SELECT student.name
+        FROM t_student student
+        WHERE no = #{studentNo}
+    </select>
+
+    <select id="queryFamousFamilyList" resultType="map">
+        select * from t_famous_family
+    </select>
+
+    <select id="queryStudentsAwardOrPunishmentList" resultType="map" parameterType="string">
+        select * from t_own_punishment
+        WHERE studentNo = #{studentNo}
+    </select>
+
+    <insert id="addAwardOrPunishmentByUpdate" parameterType="OwnOrPunishment">
+        insert into t_own_punishment (date,centent,studentNo,witness) values (#{date},#{centent},#{studentNo},#{witness})
+    </insert>
+    <insert id="addDisciplineAndPunishmentByUpdate" parameterType="disciplineAndPunishmen">
+        insert into t_discipline_and_punishment (date,studentNo,category,behavior,rank,witness) values (#{date},#{studentNo},#{category},#{behavior},#{rank},#{witness})
+    </insert>
+
+    <select id="showAutoProfessionListByDepartment" parameterType="string" resultType="map">
+        select * from t_profession
+        WHERE department_id = #{departmentId}
+    </select>
+
+    <select id="showAutoDirectionListByDepartment" parameterType="string" resultType="map">
+        select * from t_direction
+        WHERE department_id = #{departmentId}
+    </select>
+
+    <select id="queryAllStudentsProfessionList" resultType="map">
+        select * from t_profession
+    </select>
+
+    <select id="queryDirectionSelectionClass" parameterType="string" resultType="map">
+        select * from t_classes
+        WHERE direction_id = #{directionId}
+    </select>
+
+    <select id="querylevelSelectionClass" parameterType="string" resultType="map">
+        select * from t_classes
+        WHERE level = #{levelName}
+    </select>
+
+    <select id="queryDisciplineAndPunishment" parameterType="string" resultType="map">
+        select * from t_discipline_and_punishment
+        WHERE studentNo = #{studentNo}
+    </select>
+    <select id="queryGroupActivitiesList" parameterType="string" resultType="map">
+        select * from t_group_activities
+        WHERE studentNo = #{studentNo}
+    </select>
+
+    <delete id="delDisciplineAndPunishment" parameterType="string">
+        DELETE FROM t_discipline_and_punishment
+        WHERE id = #{id}
+    </delete>
+
+    <insert id="addGroupActivitiesByUpdate" parameterType="GroupActivities">
+        insert into t_group_activities (date,studentNo,types,hours,heading,witness) values (#{date},#{studentNo},#{types},#{hours},#{heading},#{witness});
+    </insert>
+
+    <delete id="delGroupActivities" parameterType="string">
+        DELETE FROM t_group_activities
+        WHERE id = #{id}
+    </delete>
+
+    <update id="updateGroupActivitiesInfo" parameterType="map">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE t_group_activities groupActivities
+            <set>
+                <if test="item.updateStudent_groupActivities_date_list != null">
+                    groupActivities.date = #{item.updateStudent_groupActivities_date_list},
+                </if>
+
+                <if test="item.updateStudent_groupActivities_content_list != null">
+                    groupActivities.content = #{item.updateStudent_groupActivities_content_list},
+                </if>
+            </set>
+            WHERE groupActivities.id = #{item.updateStudent_groupActivities_id_list}
+        </foreach>
+    </update>
+
+    <update id="updateDisciplineAndPunishmentInfo" parameterType="map">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE t_discipline_and_punishment disciplineAndPunishment
+            <set>
+                <if test="item.updateStudent_disciplineAndPunishment_date_list != null">
+                    disciplineAndPunishment.date = #{item.updateStudent_disciplineAndPunishment_date_list},
+                </if>
+
+                <if test="item.updateStudent_disciplineAndPunishment_content_list != null">
+                    disciplineAndPunishment.content = #{item.updateStudent_disciplineAndPunishment_content_list},
+                </if>
+            </set>
+            WHERE disciplineAndPunishment.id = #{item.updateStudent_disciplineAndPunishment_id_list}
+        </foreach>
+    </update>
+    <update id="updateAwardOrPunishmentInfo" parameterType="map">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE t_own_punishment ownPunishment
+            <set>
+                <if test="item.updateStudent_Award_or_punishment_date_list != null">
+                    ownPunishment.date = #{item.updateStudent_Award_or_punishment_date_list},
+                </if>
+
+                <if test="item.updateStudent_Award_or_punishment_content_list != null">
+                    ownPunishment.centent = #{item.updateStudent_Award_or_punishment_content_list},
+                </if>
+            </set>
+            WHERE ownPunishment.id = #{item.updateStudent_Award_or_punishment_id_list}
+        </foreach>
+    </update>
+
+    <update id="revokeDisciplineAndPunishment" parameterType="string">
+        UPDATE t_discipline_and_punishment SET revokeDiscipline = #{revokeDiscipline}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

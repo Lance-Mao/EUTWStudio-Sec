@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.NewStudentRegisterDao">
+    <select id="queryStudentPunishmentByNo" parameterType="string" resultType="string">
+        SELECT centent FROM t_own_punishment WHERE t_own_punishment.studentNo = #{no}
+    </select>
+    <select id="queryRegisterBasicInfo" parameterType="string" resultType="map">
+        SELECT
+            student.name    studentName,
+            profession.name professionName,
+            classes.name    classesName,
+            no,
+            student.head_image,
+            in_school,
+            gender,
+            born,
+            f.para_dispname famous_family,
+            is_marry,
+            native_place origin_address,
+            political_status,
+            student_classify,
+            actual_address,
+            family_zip_code,
+            student.student_contact_method phone,
+            pre_school_name,
+            pre_school_work,
+            pre_school_staff,
+            health_status,
+            idcard,
+            own_experience,
+            own_punishment,
+            partyOrGroupOrganizationText,
+            Pre_admissionOrRewardText,
+            pre_school_education
+        FROM t_student student
+            LEFT JOIN (SELECT para_dispname,para_no FROM t_famous_family) f on f.para_no = student.famous_family
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_profession) profession ON profession.id = student.profession_id
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_classes) classes ON classes.id = student.classes_id
+        WHERE no = #{no}
+    </select>
+
+    <select id="queryStudentExperience" parameterType="string" resultType="map">
+        SELECT
+            start_time,
+            end_time,
+            work_place,
+            staff,
+            witness
+        FROM t_student_experience
+        WHERE no = #{no}
+    </select>
+
+    <select id="queryStudentFamily" parameterType="string" resultType="map">
+        SELECT
+            relationship,
+            name,
+            political_status,
+            staff,
+            work_place,
+            phone
+        FROM t_student_family
+        WHERE no = #{no}
+    </select>
+</mapper>

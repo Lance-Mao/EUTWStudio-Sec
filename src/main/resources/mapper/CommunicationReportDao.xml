@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.CommunicationReportDao">
+    <select id="queryCommunications" resultType="map">
+        SELECT teacher.name teacher,student.level,direction type,talk_name FROM t_communication communication
+        LEFT JOIN (SELECT no,level FROM t_student) student on student.no = communication.student_id
+        LEFT JOIN (SELECT no,name FROM t_teacher) teacher on teacher.no = communication.teacher_id
+        WHERE level in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY teacher_id DESC ,direction DESC ,level ASC
+    </select>
+
+</mapper>

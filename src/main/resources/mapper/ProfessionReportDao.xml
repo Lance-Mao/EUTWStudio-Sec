@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.ProfessionReportDao">
+    <select id="queryProfessionReport" parameterType="string" resultType="map">
+        SELECT department.name departmentName,profession.name professionName,level,student.no FROM t_student student
+        LEFT JOIN (SELECT id,name FROM t_department) department on department.id = student.department_id
+        LEFT JOIN (SELECT id,name FROM t_profession) profession on profession.id = student.profession_id
+        WHERE level in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY department_id DESC ,profession_id DESC ,level ASC
+    </select>
+</mapper>

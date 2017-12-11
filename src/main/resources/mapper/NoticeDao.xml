@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.NoticeDao">
+
+    <insert id="addNotice" parameterType="Notice" >
+        INSERT INTO t_notice (name, title,content, time)
+        VALUES (#{name}, #{title}, #{content}, #{time})
+    </insert>
+
+    <select id="list" resultType="map">
+        SELECT * from t_notice order by id desc
+    </select>
+    <delete id="delete" parameterType="int">
+        DELETE FROM t_notice
+        WHERE id = #{id}
+    </delete>
+</mapper>

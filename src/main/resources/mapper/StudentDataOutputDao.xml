@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.StudentDataOutputDao">
+    <select id="queryStudentList" resultType="map" parameterType="map">
+        SELECT
+        student.*,
+        department.name department,
+        profession.name profession,
+        direction.name direction,
+        class.name classes,
+        area.name area,
+        floor.name floor,
+        room.name room,
+        teacher.name teacher_name,
+        teacherCommunity.name community_teacher_name
+        FROM t_student student
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_department) department ON department.id = student.department_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_direction) direction ON direction.id = student.direction_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_profession) profession ON profession.id = student.profession_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_classes) class ON class.id = student.classes_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_area) area ON area.id = student.area_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_floor) floor ON floor.id = student.floor_id
+
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_room) room ON room.id = student.room_id
+        LEFT JOIN (SELECT
+        t_teacher.no,
+        name,
+        gender
+        FROM t_teacher) teacher ON teacher.no = student.teacher_id
+        LEFT JOIN (SELECT
+        t_teacher.no,
+        name,
+        gender
+        FROM t_teacher) teacherCommunity ON teacherCommunity.no = student.community_teacher_id
+
+        WHERE
+        student.name LIKE #{dataSearchDto.dataName}
+        and student.no LIKE #{dataSearchDto.studentNo}
+        and student.gender LIKE #{dataSearchDto.sex}
+
+
+        <if test=" dataSearchDto.classesId !=''">
+            and student.classes_id LIKE #{dataSearchDto.classesId}
+        </if>
+
+        <if test=" dataSearchDto.dataLevel != ''">
+            and student.level = #{dataSearchDto.dataLevel}
+        </if>
+
+        <if test=" dataSearchDto.departmentId !=''">
+            and student.department_id = #{dataSearchDto.departmentId}
+        </if>
+
+        <if test=" dataSearchDto.directionId !=''">
+            and student.direction_id = #{dataSearchDto.directionId}
+        </if>
+        <if test=" dataSearchDto.professionId !=''">
+            and student.profession_id = #{dataSearchDto.professionId}
+        </if>
+
+        <if test=" dataSearchDto.teacherId !=''">
+            and student.teacher_id = #{dataSearchDto.teacherId}
+        </if>
+
+        <if test=" dataSearchDto.communityTeacherId !=''">
+            and student.community_teacher_id = #{dataSearchDto.communityTeacherId}
+        </if>
+
+        <if test=" dataSearchDto.TypeOfAccommodation !=''">
+            and student.stay_type = #{dataSearchDto.TypeOfAccommodation}
+        </if>
+        <if test=" dataSearchDto.studentStatusSearch !=''">
+            and student.student_status = #{dataSearchDto.studentStatusSearch}
+        </if>
+
+        <if test=" dataSearchDto.areaId !=''">
+            <if test="dataSearchDto.TypeOfAccommodation == 1">
+                and student.area_id = #{dataSearchDto.areaId}
+            </if>
+        </if>
+        <if test=" dataSearchDto.floorId !=''">
+            <if test="dataSearchDto.TypeOfAccommodation == 1">
+                and student.floor_id = #{dataSearchDto.floorId}
+            </if>
+        </if>
+        <if test=" dataSearchDto.roomId !=''">
+            <if test="dataSearchDto.TypeOfAccommodation == 1">
+                and room.name LIKE #{dataSearchDto.roomId}
+            </if>
+        </if>
+
+        ORDER BY -student_status DESC
+    </select>
+</mapper>

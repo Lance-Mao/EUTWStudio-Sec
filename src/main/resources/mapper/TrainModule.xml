@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.TrainModuleDao">
+
+    <!--方案-->
+    <select id="queryTrainProgramTotalCount" resultType="long">
+        SELECT count(1)
+        FROM t_train_program;
+    </select>
+    <select id="queryTrainPrograms" parameterType="map" resultType="map">
+        SELECT
+            program.id,
+            level,
+            department.name department,
+            direction.name  direction
+        FROM t_train_program program
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_department) department ON department.id = program.department_id
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_direction) direction ON direction.id = program.direction_id
+        ORDER BY level DESC
+        LIMIT #{start}, #{end}
+    </select>
+    <insert id="addTrainProgram" parameterType="TrainModule" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_train_program (department_id, direction_id, level)
+        VALUES (#{departmentId}, #{directionId}, #{level})
+    </insert>
+    <insert id="addProgramModuleCourses" parameterType="map">
+        INSERT INTO t_program_module_course (program_id, module_id, cource_id) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.programId},#{item.moduleId},#{item.courseId})
+        </foreach>
+    </insert>
+    <select id="queryModuleIdsByProgramId" parameterType="int" resultType="String">
+        SELECT cource_id
+        FROM t_course course
+            LEFT JOIN (SELECT
+                           program_id,
+                           cource_id
+                       FROM t_program_module_course) t ON t.cource_id = course.id
+        WHERE t.program_id = #{id}
+    </select>
+    <delete id="deleteProgramModuleCoursesByProgramId" parameterType="int">
+        DELETE FROM t_program_module_course
+        WHERE program_id = #{id}
+    </delete>
+    <delete id="deleteProgramById" parameterType="int">
+        DELETE FROM t_train_program
+        WHERE id = #{id}
+    </delete>
+    <!--模块-->
+    <select id="queryAllModuleCourses" resultType="map">
+      SELECT
+          module.id           id,
+          module.name         moduleName,
+          course.id           courseId,
+          course.name         courseName,
+          course.nature,
+          course.code,
+          course.school_score schoolScore,
+          course.school_hours schoolHours,
+          testMethod.name testMethodName
+        FROM t_train_module module
+          LEFT JOIN (SELECT *
+                     FROM t_course) course ON module.id = course.module_id
+          LEFT JOIN (SELECT *
+                     FROM t_test_method) testMethod ON testMethod.id = course.method
+    </select>
+    <select id="queryTrainModuleTotalCount" resultType="long">
+        SELECT count(1)
+        FROM t_train_module
+    </select>
+    <select id="queryAllTrainModules" resultType="map">
+        SELECT *
+        FROM t_train_module;
+    </select>
+    <select id="queryTrainModuleList" resultType="CourseModule">
+        SELECT *
+        FROM t_train_module
+        LIMIT #{start}, #{end}
+    </select>
+    <insert id="insertCourseModule" parameterType="CourseModule">
+        INSERT INTO t_train_module (code, name) VALUES (#{code}, #{name})
+    </insert>
+
+    <update id="updateCourseModule" parameterType="CourseModule">
+        UPDATE t_train_module
+        SET code = #{code}, name = #{name}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteCourseModule" parameterType="string">
+        DELETE FROM t_train_module
+        WHERE id = #{id}
+    </delete>
+
+    <!--课程-->
+    <insert id="addCourse" parameterType="Course">
+        INSERT INTO t_course (department_id,code, name, school_score, school_hours, semester, nature, method, module_id)
+        VALUES (#{departmentId},#{code}, #{name}, #{schoolScore}, #{schoolHours}, #{semester}, #{nature}, #{method}, #{moduleId})
+    </insert>
+    <update id="updateCourse" parameterType="Course">
+        UPDATE t_course
+        SET code     = #{code}, name = #{name}, school_score = #{schoolScore}, school_hours = #{schoolHours},
+            semester = #{semester}, nature = #{nature}, method = #{method}, module_id = #{moduleId},department_id=#{departmentId}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteCourse" parameterType="string">
+        DELETE FROM t_course
+        WHERE id = #{id}
+    </delete>
+    <select id="queryCoursesTotalCount" resultType="long" parameterType="map">
+        SELECT count(1)
+        FROM t_course
+        <where>
+            <if test="moduleId != ''">
+                and module_id = #{moduleId}
+            </if>
+            <if test="departmentId != ''">
+                and department_id = #{departmentId}
+            </if>
+            <if test="semester != ''">
+                and semester = #{semester}
+            </if>
+            AND t_course.name LIKE #{name}
+        </where>
+    </select>
+
+    <select id="queryCoursesList" parameterType="map" resultType="map">
+        SELECT
+        t_course.id,
+        department.id departmentId,
+        department.name departmentName,
+        code,
+        t_course.nature,
+        t_course.name,
+        school_hours schoolHours,
+        school_score schoolScore,
+        semester,
+        method methodId,
+        m.name method,
+        module.name moduleName,
+        module_id moduleId
+        FROM t_course
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_train_module) module ON module.id = t_course.module_id
+        LEFT JOIN (SELECT id,name FROM t_test_method) m on m.id = t_course.method
+        LEFT JOIN (SELECT id,name FROM t_department) department on department.id = t_course.department_id
+        <where>
+            <if test="moduleId != ''">
+                and module_id = #{moduleId}
+            </if>
+            <if test="departmentId != ''">
+                and department_id = #{departmentId}
+            </if>
+            <if test="semester != ''">
+                and semester = #{semester}
+            </if>
+
+            AND t_course.name LIKE #{name}
+            ORDER BY departmentId DESC,id,moduleName
+            LIMIT #{start}, #{end}
+        </where>
+
+    </select>
+    <!--班级-->
+    <select id="queryClassesTotalCount" resultType="long">
+        SELECT count(1)
+        FROM t_classes
+    </select>
+
+    <select id="queryClassesList" resultType="map">
+        SELECT
+            classes.*,
+            department.name departmentName,
+            direction.name  directionName,
+            department_id   departmentId,
+            direction.id    directionId
+        FROM t_classes classes
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_direction) direction ON direction.id = classes.direction_id
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_department) department ON department.id = classes.department_id
+        LIMIT #{start}, #{end}
+    </select>
+    <update id="updateClasses" parameterType="Classes">
+        UPDATE t_classes
+        SET level = #{level}, name = #{name}, department_id = #{departmentId}, direction_id = #{directionId}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteClasses" parameterType="string">
+        DELETE FROM t_classes
+        WHERE id = #{id}
+    </delete>
+    <insert id="addClassesManual" parameterType="Classes">
+        INSERT t_classes (department_id, direction_id, level, name)
+        VALUES (#{departmentId}, ${directionId}, #{level}, #{name})
+    </insert>
+    <select id="queryClassesByTeacherHas" parameterType="string" resultType="Classes">
+        SELECT *
+        FROM t_classes
+        WHERE teacher_id = #{no}
+    </select>
+    <select id="queryClassessByDepartmentId" resultType="Classes">
+        SELECT *
+        FROM t_classes
+        WHERE department_id = #{id} AND level >= #{start}
+        ORDER BY level ASC
+    </select>
+    <select id="queryClassess" resultType="Classes">
+        SELECT *
+        FROM t_classes
+        ORDER BY level ASC,department_id ASC ,t_classes.direction_id ASC ,name ASC
+    </select>
+    <update id="updateClassTeacher">
+        UPDATE t_classes SET teacher_id = #{no} WHERE id IN
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+    <delete id="deleteTeacherAllClassesId" parameterType="string">
+        UPDATE t_classes
+        SET teacher_id = ""
+        WHERE teacher_id = #{no}
+    </delete>
+    <select id="loadTeacherHasClassess" resultType="Classes" parameterType="string">
+        SELECT *
+        FROM t_classes
+        WHERE teacher_id = #{no}
+    </select>
+
+    <select id="queryTestMethodTotalCount" resultType="long">
+        SELECT COUNT(*)
+        FROM t_test_method
+    </select>
+
+    <select id="queryAllTestMethod" parameterType="map" resultType="map">
+        SELECT *
+        FROM t_test_method
+        LIMIT #{start}, #{pageSize}
+    </select>
+
+    <insert id="addTestMethod" parameterType="map">
+        INSERT INTO t_test_method (name)
+        VALUES (#{name})
+    </insert>
+
+    <update id="updateTestMethod" parameterType="map">
+        UPDATE t_test_method
+        SET t_test_method.name = #{name}
+        WHERE t_test_method.id = #{id}
+    </update>
+
+    <delete id="deleteTestMethod" parameterType="string">
+        DELETE FROM t_test_method
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteTeacherCommunityAllClassesId" parameterType="string">
+        UPDATE t_teacher_community
+        SET no = ""
+        WHERE no = #{no}
+    </delete>
+
+    <select id="queryTrainProgramByNo" parameterType="string" resultType="map">
+        SELECT
+            program.id,
+            program.level,
+            department.name departmentName,
+            direction.name  directionName
+        FROM t_train_program program
+            LEFT JOIN (SELECT
+                           no,
+                           department_id,
+                           level,
+                           direction_id
+                       FROM t_student) student ON student.no = #{studentNo}
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_department) department ON department.id = student.department_id
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_direction) direction ON direction.id = student.direction_id
+        WHERE student.level = program.level AND student.direction_id = program.direction_id AND
+              student.department_id = program.department_id
+    </select>
+</mapper>

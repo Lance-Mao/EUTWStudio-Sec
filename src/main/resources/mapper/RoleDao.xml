@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.RoleDao">
+
+    <update id="updateAvailable" parameterType="Role">
+        UPDATE t_role
+        SET t_role.available = #{available}
+        WHERE t_role.id = #{id}
+    </update>
+
+    <update id="deleteRolePermissions">
+        DELETE FROM t_role_permission
+        WHERE
+        sys_role_id = #{roleId} AND sys_permission_id IN
+        <foreach collection="shouldDelete" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <insert id="addRolePermissions">
+        INSERT INTO t_role_permission (sys_role_id, sys_permission_id) VALUES
+        <foreach collection="shouldInsert" item="perId" separator="," close=";">
+            (#{roleId},#{perId})
+        </foreach>
+    </insert>
+
+    <select id="query" parameterType="string" resultType="Role">
+        SELECT *
+        FROM t_role
+        WHERE id = #{roleId}
+    </select>
+    <update id="update" parameterType="Role">
+        UPDATE t_role
+        SET t_role.name = #{name}, t_role.available = #{available}
+        WHERE t_role.id = #{id}
+    </update>
+    <update id="deletePermission" parameterType="string">
+          delete from t_role where id = #{roleId}
+    </update>
+    <select id="queryList" parameterType="Map" resultType="Map">
+        SELECT *
+        FROM t_role
+        LIMIT #{start }, #{end}
+    </select>
+
+    <select id="queryTotalCount" resultType="long">
+        SELECT count(1)
+        FROM t_role
+    </select>
+
+    <insert id="add" parameterType="Role">
+        INSERT INTO t_role (name, available) VALUES (#{name}, #{available})
+    </insert>
+
+    <select id="queryAllPermission" resultType="Permission">
+        SELECT
+            id,
+            name,
+            parentid,
+            parentids
+        FROM t_permission
+        WHERE parentid != 0
+        ORDER BY sortstring ASC;
+    </select>
+
+    <select id="queryPermissionByRoleId" resultType="string" parameterType="string">
+        SELECT permission.id
+        FROM t_permission permission
+            LEFT JOIN (SELECT
+                           sys_permission_id,
+                           sys_role_id
+                       FROM t_role_permission) role ON role.sys_role_id = #{roleId}
+        WHERE role.sys_permission_id = permission.id
+    </select>
+
+
+    <select id="queryUserRoleTotalCount" resultType="long" parameterType="string">
+        SELECT count(1)
+        FROM t_user
+        WHERE t_user.name LIKE #{name} and roleId != 3
+    </select>
+    <select id="queryUserRoleList" parameterType="map" resultType="map">
+        SELECT
+            username,
+            user.name name,
+            staff,
+            roleId,
+            role.name roleName
+        FROM t_user user
+            LEFT JOIN (SELECT *
+                       FROM t_role) role ON role.id = user.roleId
+        WHERE user.name LIKE #{name} and roleId != 3
+        LIMIT #{start }, #{end}
+    </select>
+
+    <select id="queryAll" resultType="Role">
+        SELECT *
+        FROM t_role
+    </select>
+
+    <update id="updateUserRole" parameterType="ActiveUser">
+        UPDATE t_user
+        SET roleId = #{roleId}
+        WHERE username = #{userName}
+    </update>
+</mapper>

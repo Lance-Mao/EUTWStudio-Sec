@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.DepartmentDao">
+    <select id="queryClassByDirectionIdAndLevel" resultType="map">
+        SELECT id,name FROM t_classes WHERE
+            t_classes.direction_id = #{directionId}
+        <if test="level != ''">
+            and level = #{level}
+        </if>
+    </select>
+    <select id="queryClassesByDirectionId" parameterType="string" resultType="map">
+        SELECT id,name FROM t_classes WHERE t_classes.direction_id=#{id}
+    </select>
+    <!--系-->
+    <select id="queryAllDepartments" resultType="Department">
+        SELECT *
+        FROM t_department
+    </select>
+    <delete id="deleteDepartment" parameterType="string">
+        DELETE FROM t_department
+        WHERE id = #{id}
+    </delete>
+    <select id="queryDepartmentTotalCount" resultType="long">
+        SELECT count(1)
+        FROM t_department
+    </select>
+
+    <select id="queryDepartmentList" resultType="Department">
+        SELECT *
+        FROM t_department
+        LIMIT #{start}, #{end}
+    </select>
+
+    <insert id="addDepartment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_department (code, name) VALUES (#{code}, #{name})
+    </insert>
+    <update id="updateProfessionDepartmentId">
+        update t_profession SET department_id =#{id} where id in
+        <foreach collection="professions" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+    <update id="updateDirectionDepartmentId">
+        update t_direction SET department_id =#{id} where id in
+        <foreach collection="directions" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+    <select id="queryProfessionIdsByDepartmentId" parameterType="string" resultType="string">
+        SELECT id
+        FROM t_profession
+        WHERE department_id = #{id};
+    </select>
+    <select id="queryProfessionsByDepartmentId" parameterType="string" resultType="Profession">
+        SELECT *
+        FROM t_profession
+        WHERE department_id = #{id};
+    </select>
+    <!--专业方向-->
+    <select id="queryAllDirections" resultType="map">
+        SELECT id,name FROM t_direction
+    </select>
+    <select id="queryDirectionIdsByDepartmentId" parameterType="string" resultType="string">
+        SELECT id
+        FROM t_direction
+        WHERE department_id = #{id};
+    </select>
+    <select id="queryDirectionsByDepartmentId" parameterType="string" resultType="Direction">
+        SELECT *
+        FROM t_direction
+        WHERE department_id = #{id};
+    </select>
+    <update id="deleteDirectionDepartmentIdByDepartmentId" parameterType="string">
+        UPDATE t_direction
+        SET department_id = ""
+        WHERE department_id = #{id}
+    </update>
+    <insert id="insertDirectionsDepartmentIds">
+        UPDATE t_direction SET department_id = #{departmentId} WHERE id IN
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </insert>
+    <delete id="deleteDirectionsDepartmentId" parameterType="string">
+        UPDATE t_direction SET department_id = "" WHERE id IN
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="queryDirectTotalCount" resultType="long">
+        SELECT count(1)
+        FROM t_direction
+    </select>
+    <select id="queryDirections" resultType="Direction">
+        SELECT * FROM t_direction
+    </select>
+    <select id="queryProfessions" resultType="Profession">
+        SELECT * FROM t_profession
+    </select>
+    <select id="queryDirectionList" resultType="map">
+        SELECT t_direction.*,department.name departmentName
+        FROM t_direction
+            LEFT JOIN (SELECT id,name FROM t_department) department on department.id = t_direction.department_id
+        LIMIT #{start}, #{end}
+    </select>
+    <insert id="insertDirection" parameterType="Direction">
+        INSERT INTO t_direction (code, name) VALUES (#{code}, #{name})
+    </insert>
+    <update id="updateDepartment" parameterType="Department">
+        UPDATE t_department
+        SET code = #{code}, name = #{name}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateDirection" parameterType="Direction">
+        UPDATE t_direction
+        SET code = #{code}, name = #{name}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteDirection" parameterType="string">
+        DELETE FROM t_direction
+        WHERE id = #{id}
+    </delete>
+
+    <!--专业-->
+    <select id="queryAllProfession" resultType="map">
+        SELECT  id,name FROM t_profession
+    </select>
+    <update id="deleteProfessionDepartmentIdByDepartmentId" parameterType="string">
+        UPDATE t_profession
+        SET department_id = ""
+        WHERE department_id = #{id}
+    </update>
+    <delete id="deleteProfessionsDepartmentId" parameterType="string">
+        UPDATE t_profession SET department_id = "" WHERE id IN
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <insert id="insertProfessionsDepartmentIds">
+        UPDATE t_profession SET department_id = #{departmentId} WHERE id IN
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </insert>
+    <select id="queryProfessionTotalCount" resultType="long">
+        SELECT count(1)
+        FROM t_profession
+    </select>
+
+    <select id="queryProfessionList" resultType="map">
+        SELECT t_profession.*,department.name departmentName
+        FROM t_profession
+        LEFT JOIN (SELECT id,name FROM t_department) department on department.id = t_profession.department_id
+        LIMIT #{start}, #{end}
+    </select>
+    <insert id="insertProfession" parameterType="Profession">
+        INSERT INTO t_profession (code, name) VALUES (#{code}, #{name})
+    </insert>
+
+    <update id="updateProfession" parameterType="Profession">
+        UPDATE t_profession
+        SET code = #{code}, name = #{name}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteProfession" parameterType="string">
+        DELETE FROM t_profession
+        WHERE id = #{id}
+    </delete>
+    <!--部门-->
+    <select id="queryDeptList" resultType="Dept">
+        SELECT * from t_dept
+    </select>
+</mapper>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.DormDao">
+
+
+    <select id="queryAreas" resultType="map" parameterType="map">
+        select * from t_area
+        WHERE TRUE
+        <if test="areaId != ''">
+            AND id LIKE #{areaId}
+        </if>
+        <if test="areaName != ''">
+            AND name LIKE #{areaName}
+        </if>
+        ORDER BY id
+        limit #{start},#{pageSize}
+    </select>
+
+    <select id="queryAreasTotalCount" resultType="long" parameterType="map">
+        select count(*) from t_area
+        WHERE TRUE
+        <if test="areaId != ''">
+            AND id LIKE #{areaId}
+        </if>
+        <if test="areaName != ''">
+            AND name LIKE #{areaName}
+        </if>
+    </select>
+
+    <insert id="addArea" parameterType="string">
+        INSERT INTO t_area(name)
+        VALUES(#{name})
+    </insert>
+
+    <update id="updateArea" parameterType="map">
+        UPDATE t_area
+        SET t_area.name = #{name}
+        WHERE t_area.id = #{id}
+    </update>
+
+    <delete id="deleteArea" parameterType="string">
+        DELETE FROM t_area
+        WHERE id = #{id}
+    </delete>
+
+    <select id="queryFloors" resultType="map" parameterType="map">
+        select *,a.id areaId,a.name areaName from t_floor f
+        LEFT JOIN
+        (select id,name from t_area ) a on f.area_id = a.id
+        <where>
+            <if test="areaId != ''">
+                AND f.area_id = #{areaId}
+            </if>
+
+            <if test="floorId != ''">
+                AND f.id = #{floorId}
+            </if>
+        </where>
+        ORDER BY f.id,a.id
+        limit #{start},#{pageSize}
+    </select>
+
+    <select id="queryFloorsTotalCount" resultType="long">
+        select count(*) from t_floor f
+        LEFT JOIN
+        (select id,name from t_area ) a on f.area_id = a.id
+        <where>
+            <if test="areaId != ''">
+                AND f.area_id = #{areaId}
+            </if>
+
+            <if test="floorId != ''">
+                AND f.id = #{floorId}
+            </if>
+        </where>
+
+    </select>
+
+    <insert id="addFloor" parameterType="string">
+        INSERT INTO t_floor(name,area_id)
+        VALUES(#{name},#{areaId})
+    </insert>
+
+    <update id="updateFloor" parameterType="map">
+        UPDATE t_floor
+        SET t_floor.name = #{name}
+        WHERE t_floor.id = #{id}
+    </update>
+
+    <delete id="deleteFloor" parameterType="string">
+        DELETE FROM t_floor
+        WHERE id = #{id}
+    </delete>
+
+    <select id="selectAreaOfFloor" resultType="map">
+        select * from t_area
+    </select>
+
+
+    <select id="queryRooms" resultType="map" parameterType="map">
+        select
+        r.id,
+        r.name,
+        r.floor_id,
+        f.name floorName,
+        a.name areaName,
+        a.id areaId
+        from t_room r
+        LEFT JOIN
+        (select id,name,area_id from t_floor) f ON f.id = r.floor_id
+        LEFT JOIN
+        (select id,name from t_area) a ON f.area_id = a.id
+        <where>
+            <if test="areaId != '' and areaId != null">
+                AND f.area_id = #{areaId}
+            </if>
+
+            <if test="floorId != '' and floorId != null">
+                AND f.id = #{floorId}
+            </if>
+            AND r.name LIKE #{roomNo}
+            ORDER BY r.id ,f.id,a.id
+            limit #{start},#{pageSize}
+        </where>
+    </select>
+
+    <select id="queryRoomsTotalCount" resultType="long">
+        select count(*) from t_room r
+        LEFT JOIN
+        (select id,name,area_id from t_floor) f ON f.id = r.floor_id
+        LEFT JOIN
+        (select id,name from t_area) a ON f.area_id = a.id
+        <where>
+            <if test="areaId != '' and areaId != null">
+                AND f.area_id = #{areaId}
+            </if>
+
+            <if test="floorId != '' and floorId != null">
+                AND f.id = #{floorId}
+            </if>
+            AND r.name LIKE #{roomNo}
+        </where>
+    </select>
+
+    <insert id="addRoom" parameterType="map">
+        INSERT INTO t_room(name,floor_id)
+        VALUES(#{name},#{floorId})
+    </insert>
+
+    <update id="updateRoom" parameterType="map">
+        UPDATE t_room r
+        SET r.name = #{name}, r.floor_id = #{floorId}
+        WHERE r.id = #{id}
+    </update>
+
+    <delete id="deleteRoom" parameterType="string">
+        DELETE FROM t_room
+        WHERE id = #{id}
+    </delete>
+
+    <select id="queryAreaOfRoom" resultType="map">
+        select * from t_area
+    </select>
+
+    <select id="queryFloorOfRoom" resultType="map">
+        SELECT * FROM t_floor
+        WHERE area_id = #{areaId}
+    </select>
+
+    <select id="showFloorsAndRooms" parameterType="string" resultType="map">
+        select * from t_room
+        WHERE floor_id = #{floorId}
+    </select>
+
+    <select id="queryAreaAndFloorAndRoomByRoomId" parameterType="string" resultType="map">
+        select
+          area.name areaName,
+          floor.id floorId,
+          floor.name floorName,
+          room.id roomId,
+          room.name roomName
+        from t_area area
+          LEFT JOIN (
+                      select * from t_floor )floor ON floor.area_id = area.id
+          LEFT JOIN (
+                      select * from t_room )room on room.floor_id = floor.id
+        WHERE room.id = #{roomId}
+    </select>
+
+    <select id="queryAllArea" resultType="map">
+        select * from t_area
+    </select>
+
+</mapper>

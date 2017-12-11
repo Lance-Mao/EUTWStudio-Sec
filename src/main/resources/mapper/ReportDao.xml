@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thoughtWorks.dao.ReportDao">
+
+    <select id="queryOldAndNewProfessionIds" parameterType="string" resultType="map">
+        SELECT
+            origin_profession_id oldId,
+            profession_id        nowId
+        FROM t_student student
+            LEFT JOIN (SELECT
+                           id,
+                           name
+                       FROM t_classes) classes ON classes.id = student.classes_id
+        WHERE classes.name LIKE #{level}
+        ORDER BY origin_profession_id ASC
+    </select>
+    <select id="queryProfessions" resultType="map">
+        SELECT * FROM t_profession
+    </select>
+    <select id="queryDepartments" resultType="map">
+        SELECT * FROM t_department
+    </select>
+    <select id="queryDormPeopleNumber" parameterType="List" resultType="map">
+        SELECT
+        department.name departmentName,
+        student.level,
+        student.stay_type stayTypeName,
+        student.no,
+        student.name
+        FROM t_student student
+        LEFT JOIN (SELECT
+        id,
+        name
+        FROM t_department ) department ON department.id = student.department_id
+        WHERE
+        <foreach collection="list"  item="level"  separator="OR">
+        student.level =#{level}
+        </foreach>
+        AND student.department_id = department.id
+        order by department.name asc,student.stay_type ASC ,student.level ASC
+    </select>
+</mapper>
