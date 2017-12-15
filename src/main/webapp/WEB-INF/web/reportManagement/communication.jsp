@@ -57,6 +57,7 @@
         communication = {
             list: function () {
                 $.post(baseUrl + "/communicationReport/list", function (data) {
+                    console.log(data);
                     if (data.result) {
                         console.log(data);
                         let date = new Date();

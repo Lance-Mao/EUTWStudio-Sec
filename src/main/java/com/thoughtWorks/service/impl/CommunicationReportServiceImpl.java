@@ -44,34 +44,40 @@ public class CommunicationReportServiceImpl implements CommunicationReportServic
     @Override
     public List<Map<String, Object>> communicationList() throws Exception {
         List<Map<String, Object>> statisticCount = new ArrayList<>();
-        List<Map<String, Object>> communications = communicationReportDao.queryCommunications(DateUtil.getSearchLevels());
+        List<Map<String, Object>> communications = communicationReportDao.queryCommunications(DateUtil.getSearchLevels()); //数据1
 
         if (communications.size() == 0) return statisticCount;
 
-        for (Map<String, Object> communication : communications) {
-            if (null == communication.get("teacher")) continue;
-            if (!hasTeacher(communication, statisticCount)) {
-                statisticCount.add(createTeacher(communication));
-            }
+        for (Map<String, Object> communication : communications) {//循环2159次   童乐46次沟通  沟通年级全部为2017级
+            if (null == communication.get("teacher")) continue;  //2159次循环中老师姓名没有出现空值
+            if (!hasTeacher(communication, statisticCount)) {    //hasTeacher()该函数作用，如果在statisticCount这个新数组中发现相同老师的名字，则返回true
+                statisticCount.add(createTeacher(communication));//为新数组添加[{"teacher":""},{"type":[{},{}...]}...]  因此statisticCount集合的长度为老师的个数。长度为21
+            }  //statisticCount集合目前的形式为[{"teacher":""},{"type":[{},{}...]}...]  type属性现在还未添加值
             statisticTypeCount(statisticCount, communication);
         }
+
+//        System.out.println(statisticCount);  //数据2
 
         return statisticCount;
     }
 
     private void statisticTypeCount(List<Map<String, Object>> statisticCount, Map<String, Object> communication) {
-        for (Map<String, Object> tempCommunication : statisticCount) {
-            if (tempCommunication.get("teacher").equals(communication.get("teacher")))
-                if (!hasCommunicationType(tempCommunication.get("type"), communication))
-                    createTeacherCommunicationType(tempCommunication, communication);
+        for (Map<String, Object> tempCommunication : statisticCount) {   //循环21次 * 上面循环2159次
+            if (tempCommunication.get("teacher").equals(communication.get("teacher")))  //找出相同老师的一项
+                if (!hasCommunicationType(tempCommunication.get("type"), communication)) //communication还是从数据库查出来的值，未变化，数据1。判断tempCommunication.get("type")集合中是否有相同的沟通类型
+                    createTeacherCommunicationType(tempCommunication, communication);  //该函数返回的结果值为：
 
-            addTeacherCommunicationTypeCount(tempCommunication.get("type"), communication);
+//            System.out.println("tempCommunication-type:"+tempCommunication.get("type"));
+
+            //tempCommunication = {"teacher":""},{"type":[{"type":"沟通类型名称","level":[{"level":2015,"count":0},{"level":2016,"count":0},{"level":2017,"count":0}]...]}
+            //tempCommunication.get("type") 为[{"type":"沟通类型名称","level":[{"level":2015,"count":0},{"level":2016,"count":0},{"level":2017,"count":0}]...]
+            addTeacherCommunicationTypeCount(tempCommunication.get("type"), (String) tempCommunication.get("teacher"), communication);
         }
     }
 
     private void createTeacherCommunicationType(Map<String, Object> tempCommunication, Map<String, Object> communication) {
         List<Integer> levels = DateUtil.getSearchLevels();
-        List<Map<String, Object>> types = (List<Map<String, Object>>) tempCommunication.get("type");
+        List<Map<String, Object>> types = (List<Map<String, Object>>) tempCommunication.get("type");  //types = [{},{}...]
         if (types == null || types.size() == 0) {
             types = new ArrayList<>();
             Map<String, Object> type = createType(communication, levels);
@@ -87,29 +93,35 @@ public class CommunicationReportServiceImpl implements CommunicationReportServic
             }
         }
 
-        tempCommunication.put("type", types);
+        //types = [{"type":"沟通类型名称","level":[{"level":2015,"count":0},{"level":2016,"count":0},{"level":2017,"count":0}]...]
+        tempCommunication.put("type", types);  //tempCommunication = {"teacher":""},{"type":[{"type":"沟通类型名称","level":[{"level":2015,"count":0},{"level":2016,"count":0},{"level":2017,"count":0}]...]}
     }
 
-    private Map<String, Object> createType(Map<String, Object> communication, List<Integer> levels) {
+    //该函数循环3*2159次
+    private Map<String, Object> createType(Map<String, Object> communication, List<Integer> levels) {  //communication集合为改变‘.，levels = [2015,2016,2017]
         Map<String, Object> type = new HashMap<>();
-        type.put("type", communication.get("type"));
+        type.put("type", communication.get("type"));  //{"type":"沟通类型名称","type":"沟通类型名称"...}
         List<Map<String, Integer>> level = new ArrayList<>();
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) {  //该方法for循环循环次数 21 * 3 * 2159  目前为止循环正常。//为其中的一种沟通类型添加三个年级属性，并把沟通次数初始值设置为零
             Map<String, Integer> temp = new HashMap<>();
             temp.put("level", levels.get(i));
             temp.put("count", 0);
             level.add(temp);
-        }
-        type.put("levels", level);
+        }//level = [{"level":2015,"count":0},{"level":2015,"count":0},{"level":2015,"count":0}]   三次循环level的结果
+        type.put("levels", level); //type的结果{"type":"沟通类型名称","level":[{"level":2016,"count":0},{"level":2017,"count":0},{"level":2015,"count":0}],"type":"沟通类型名称"...}
 
         return type;
     }
 
-    private void addTeacherCommunicationTypeCount(Object communicationType, Map<String, Object> communication) {
+    private void addTeacherCommunicationTypeCount(Object communicationType,String teacher, Map<String, Object> communication) {
         List<Map<String, Object>> types = (List<Map<String, Object>>) communicationType;
+        System.out.println(teacher);
+
+//        System.out.println("types=" + types);
+        //types = tempCommunication.get("type") 为[{"type":"沟通类型名称","level":[{"level":2015,"count":0},{"level":2016,"count":0},{"level":2017,"count":0}]...]
 
         for (Map<String, Object> type : types) {
-            if (type.get("type").equals(communication.get("type")))
+            if (type.get("type").equals(communication.get("type")) && teacher.equals(communication.get("teacher")))
                 addTypeLevelCount(type, (int) communication.get("level"));
         }
     }
