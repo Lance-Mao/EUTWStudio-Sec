@@ -243,6 +243,8 @@ public class StudentController {
     public Result updateImage(MultipartFile file, HttpServletRequest request) {
         try {
             String imgPath = ImgUtil.saveImg(file, request.getServletContext().getRealPath("/images") + Constant.USER_IMAGE_PATH);
+            System.out.println("获取路径：" + request.getServletContext().getRealPath("images"));
+
             String imgName = imgPath.substring(imgPath.lastIndexOf("/"));
 
             return Result.success(imgName, Constant.UPLOAD_SUCCESS);

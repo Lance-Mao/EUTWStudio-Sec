@@ -85,7 +85,7 @@ public class DormRegisterServiceImpl implements DormRegisterService {
     private void setDepartmentProfessionStudentCount(Map<String, Object> tempDepartment, Map<String, Object> student) {
         String stayTypeName = (String) student.get("stayTypeName");
         if (stayTypeName == null) {
-            stayTypeName = "无";
+            stayTypeName = "1";
         }
         List<Map<String, Object>> stayType = (List<Map<String, Object>>) tempDepartment.get("stayType");
 

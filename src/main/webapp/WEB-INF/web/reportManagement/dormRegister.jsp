@@ -17,11 +17,12 @@
 <section class=" layui-form">
     <div class="larry-personal">
         <div class="layui-tab">
-<shiro:hasPermission name="dormRegister:exportExcel">
-            <button class="layui-btn " style="float: right" onclick="profession.exportExcel()"><i class="layui-icon">&#xe61e;</i>导出
-                EXCEl
-            </button>
-</shiro:hasPermission>
+            <shiro:hasPermission name="dormRegister:exportExcel">
+                <button class="layui-btn " style="float: right" onclick="profession.exportExcel()"><i
+                        class="layui-icon">&#xe61e;</i>导出
+                    EXCEl
+                </button>
+            </shiro:hasPermission>
             <div id="container" class="layui-tab-content larry-personal-body clearfix mylog-info-box"
                  style="background: #fff;width: 100%;height: 100%;margin: 5px 0px">
                 <div style="text-align: center;font-size: 20px;font-weight: bold;color: #21a1a1">
@@ -73,7 +74,8 @@
             showPage: function (data) {
                 let index = 0;
                 let _html = "";
-                let totalCount = [0, 0, 0,  0];
+                let totalCount = [0, 0, 0, 0];
+                console.log("查询的数据："+data);
                 data.forEach(department => {
                     let littleCount = [0, 0, 0, 0];
                     let rowSumCount = 0;
@@ -119,12 +121,12 @@
                          <th>` + (++index) + `</th>
                           <th style='font-weight: bold'>小计</th>
                           <th></th>
-                          <th>`+littleCount[0]+`</th>
-                          <th>`+littleCount[1]+`</th>
-                          <th>`+littleCount[2]+`</th>
-                          <th>`+littleCount[3]+`</th>
+                          <th>` + littleCount[0] + `</th>
+                          <th>` + littleCount[1] + `</th>
+                          <th>` + littleCount[2] + `</th>
+                          <th>` + littleCount[3] + `</th>
                     </tr>`;
-                    for(let i in totalCount)
+                    for (let i in totalCount)
                         totalCount[i] += littleCount[i];
                 });
                 _html += `<tr>

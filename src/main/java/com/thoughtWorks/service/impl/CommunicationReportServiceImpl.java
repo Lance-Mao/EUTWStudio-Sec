@@ -115,7 +115,6 @@ public class CommunicationReportServiceImpl implements CommunicationReportServic
 
     private void addTeacherCommunicationTypeCount(Object communicationType,String teacher, Map<String, Object> communication) {
         List<Map<String, Object>> types = (List<Map<String, Object>>) communicationType;
-        System.out.println(teacher);
 
 //        System.out.println("types=" + types);
         //types = tempCommunication.get("type") 为[{"type":"沟通类型名称","level":[{"level":2015,"count":0},{"level":2016,"count":0},{"level":2017,"count":0}]...]

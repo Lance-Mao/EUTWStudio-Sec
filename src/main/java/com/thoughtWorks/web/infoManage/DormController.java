@@ -267,7 +267,6 @@ public class DormController {
         try {
 
             Map<String, Object> data = dormService.showAreaAndFloorInfos(areaId);
-            System.out.println(data);
 
             return Result.success(data, Constant.SEARCH_SUCCESS);
         } catch (Exception e) {
