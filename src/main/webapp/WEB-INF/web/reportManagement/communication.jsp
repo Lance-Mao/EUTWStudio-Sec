@@ -57,9 +57,7 @@
         communication = {
             list: function () {
                 $.post(baseUrl + "/communicationReport/list", function (data) {
-                    console.log(data);
                     if (data.result) {
-                        console.log(data);
                         let date = new Date();
                         $("#time").text(date.getFullYear() + " 年 " + (date.getMonth() + 1) + " 月 " + date.getDate() + " 日");
                         communication.loadTableHead();

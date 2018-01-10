@@ -1,3 +1,10 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: mlw
+  Date: 18-1-10
+  Time: 下午4:34
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ include file="../../../public/tag.jsp" %>
 <html>
@@ -21,6 +28,17 @@
     <%--导出pdf--%>
     <script src='${baseurl}/public/pdfMake/pdfmake.min.js'></script>
     <script src='${baseurl}/public/pdfMake/vfs_fonts.js'></script>
+
+    <%--上传附件--%>
+    <!-- 引用控制层插件样式 -->
+    <link rel="stylesheet" href="${baseurl}/public/css/uploadAttachment/zyUpload.css" type="text/css">
+    <!-- 引用核心层插件 -->
+    <script type="text/javascript" src="${baseurl}/public/js/uploadAttachment/zyFile.js"></script>
+    <!-- 引用控制层插件 -->
+    <script type="text/javascript" src="${baseurl}/public/js/uploadAttachment/zyUpload.js"></script>
+    <!-- 引用初始化JS -->
+    <script type="text/javascript" src="${baseurl}/public/js/uploadAttachment/demo.js"></script>
+
     <style>
         .layui-form-radio span {
             font-size: 10px;
@@ -42,9 +60,16 @@
             padding: 4px 15px;
 
         }
+        .upload_append_list{
+            height: auto;
+        }
+        .upload_preview{
+            width: 100%;
+        }
     </style>
 </head>
 <body>
+
 <section class="larry-grid layui-form">
     <div class="larry-personal">
         <div class="layui-tab">
@@ -155,8 +180,7 @@
     </div>
     </div>
 </section>
-</body>
-
+<div id="demo" class="demo" style="display: none"></div>
 <%@include file="layer.jsp" %>
 <%@include file="pdf.jsp" %>
 <script type="text/javascript" src="${baseurl}/public/css/timeAsix/inc/colorbox.js"></script>
@@ -315,6 +339,14 @@
                     content: contents
                 }
                 communication.updateAjax(data);
+            },
+            uploadAttachment: function () {
+                layer.open({
+                    type: 1,
+                    title: "上传附件",
+                    area: ["80%", "95%"],
+                    content: $("#demo")
+                });
             },
             previewOrUpdate: function (name, studentNo, type) {
                 $("#who").text(name);

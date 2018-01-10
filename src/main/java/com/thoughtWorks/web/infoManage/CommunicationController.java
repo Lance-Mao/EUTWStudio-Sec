@@ -12,10 +12,15 @@ import com.thoughtWorks.util.Constant;
 import com.thoughtWorks.util.PageUtil;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,6 +152,20 @@ public class CommunicationController {
             List<Classes> list = personService.queryClassByDepartmentId(departmentId);
 
             return Result.success(list, Constant.SEARCH_SUCCESS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return Result.failure(null, Constant.SEARCH_FAILURE);
+    }
+
+    @RequestMapping("UploadAction")
+    @ResponseBody
+    public Result UploadAction(HttpServletRequest request) {
+        try {
+
+            System.out.println("文件长度："+123);
+            return Result.success(null, Constant.SEARCH_SUCCESS);
         } catch (Exception e) {
             e.printStackTrace();
         }

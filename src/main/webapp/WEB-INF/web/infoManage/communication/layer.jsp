@@ -201,6 +201,11 @@
             <label class="layui-form-label " style="font-size: 13px">沟通反馈记录</label>
         </div>
 
+        <a class="layui-btn layui-btn-mini " style="background: #21a1a1"
+           onclick="communication.uploadAttachment()">
+            上传附件
+        </a>
+
         <div id="content">
             <div class="layui-form-item content_node">
 
