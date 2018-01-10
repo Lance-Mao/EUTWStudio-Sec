@@ -53,7 +53,7 @@
         </div>
         <h3>学业状态</h3>
         <div id="academicStatus">
-            <input type="checkbox" value="职业导师" name="teacherId" title="职业导师">
+            <input type="checkbox" value="职业导师" name="teacher_id" title="职业导师">
             <input type="checkbox" value="学籍状态" name="student_status" title="学籍状态">
             <input type="checkbox" value="学生类型" name="student_type" title="学生类型">
             <input type="checkbox" value="高考成绩" name="sat_score" title="高考成绩">
@@ -160,7 +160,7 @@
                 let student_contact_method = $("input[name='student_contact_method']:checked").val() + "--" + $("input[name='student_contact_method']:checked").prop("name");
                 let qq = $("input[name='qq']:checked").val() + "--" + $("input[name='qq']:checked").prop("name");
                 let email = $("input[name='email']:checked").val() + "--" + $("input[name='email']:checked").prop("name");
-                let teacherId = $("input[name='teacherId']:checked").val() + "--" + $("input[name='teacherId']:checked").prop("name");
+                let teacherId = $("input[name='teacher_id']:checked").val() + "--" + $("input[name='teacher_id']:checked").prop("name");
                 let student_status = $("input[name='student_status']:checked").val() + "--" + $("input[name='student_status']:checked").prop("name");
                 let student_type = $("input[name='student_type']:checked").val() + "--" + $("input[name='student_type']:checked").prop("name");
                 let sat_score = $("input[name='sat_score']:checked").val() + "--" + $("input[name='sat_score']:checked").prop("name");
@@ -226,7 +226,7 @@
                     student_contact_method:student_contact_method,
                     qq:qq,
                     email:email,
-                    teacherId: teacherId,
+                    teacher_id: teacherId,
                     student_status: student_status,
                     student_type: student_type,
                     sat_score: sat_score,

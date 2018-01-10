@@ -51,6 +51,7 @@ public class StudentDataOutputController {
         for (Map<String, Object> dataOutputStudent : dataOutputStudents) {
             Map<String, Object> singleData = new LinkedHashMap<>();
             if (studentUpdate.getNo() != null) {
+                System.out.println("学号：" + studentUpdate.getNo());
                 singleData.put(studentUpdate.getNo().split("--")[1], dataOutputStudent.get(studentUpdate.getNo().split("--")[1]));
             }
             if (studentUpdate.getName() != null) {
@@ -275,7 +276,7 @@ public class StudentDataOutputController {
                 singleData.put(studentUpdate.getArrears_sixth_year().split("--")[1], dataOutputStudent.get(studentUpdate.getArrears_sixth_year().split("--")[1]));
             }
             if (studentUpdate.getTeacher_id() != null) {
-                singleData.put(studentUpdate.getTeacher_id().split("--")[1], dataOutputStudent.get(studentUpdate.getTeacher_id().split("--")[1]));
+                singleData.put(studentUpdate.getTeacher_id().split("--")[1], dataOutputStudent.get("teacher_name"));
             }
             if (studentUpdate.getCommunity_teacher_id() != null) {
                 singleData.put(studentUpdate.getCommunity_teacher_id().split("--")[1], dataOutputStudent.get(studentUpdate.getCommunity_teacher_id().split("--")[1]));
