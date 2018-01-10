@@ -324,7 +324,7 @@
                     if (data.result) {
                         showCommunicationContent(data.data);
                         $("#name").text(data.data[(data.data.length - 1)].name);
-                        if (data.data[(data.data.length - 1)].gender = "M") {
+                        if (data.data[(data.data.length - 1)].gender === "M") {
                             $("#gender").text("男");
                         } else {
                             $("#gender").text("女");

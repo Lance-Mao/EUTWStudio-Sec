@@ -4,7 +4,7 @@
     function printPDF(data) {
         let communicationData = data.data;
         let communicateContentHead = [];
-        if (communicationData.length - 1 >= 2){
+        if (communicationData.length >= 2){
             for (let i = 0; i < communicationData.length - 1; i++) {
                 communicateContentHead.push([
                     {
@@ -97,7 +97,6 @@
         var imgs = [];
         var imgs1 = [];
         x.oncomplete = function () {
-            console.log("complete");
             for (let key in this.imgdata) {
                 if (this.imgdata[key] == this.emptyobj) {
                     imgs.push({text: '请上传头像', fontSize: 10, rowSpan: 3});
@@ -125,10 +124,10 @@
                                         color: "#36B7AB",
                                         fontSize: 15,
                                     }],
-                                [{text: ""}, {text: ""}, {text: ""}, {text: ""}, {text: "姓名：" + info.name != undefined ? info.name : ""}],
-                                [{text: ""}, {text: ""}, {text: ""}, {text: ""}, {text: "籍贯：" + info.famousFamily != undefined ? info.famousFamily : ""}],
+                                [{text: ""}, {text: ""}, {text: ""}, {text: ""}, {text: "姓名：" + (info.name !== undefined ? info.name : "")}],
+                                [{text: ""}, {text: ""}, {text: ""}, {text: ""}, {text: "籍贯：" + (info.famousFamily !== undefined ? info.famousFamily : "")}],
                                 [{text: ""}, {text: ""}, {text: ""}, {text: ""}, {text: "身份证号：" + info.idcard}],
-                                [{text: ""}, {text: ""}, {text: ""}, {text: ""}, {text: "专业：" + info.profession != undefined ? info.profession : ""}],
+                                [{text: ""}, {text: ""}, {text: ""}, {text: ""}, {text: "专业：" + (info.profession !== undefined ? info.profession : "")}],
                                 [{text: ""}, {text: ""}, {text: ""}, {text: ""}, {text: "就业方向：" + info.direction}],
                                 [{text: ""}, {text: ""}, {text: ""}, {text: ""}, {text: "班级：" + info.classesName}],
                                 [{text: "\n\n"}, {text: ""}, {text: ""}, {text: ""}, {text: ""}],
