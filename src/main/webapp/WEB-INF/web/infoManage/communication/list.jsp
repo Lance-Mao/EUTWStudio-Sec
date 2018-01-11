@@ -31,18 +31,19 @@
 
     <%--上传附件--%>
     <!-- 引用控制层插件样式 -->
-    <link rel="stylesheet" href="${baseurl}/public/css/uploadAttachment/zyUpload.css" type="text/css">
+    <link rel="stylesheet" href="${baseurl}/public/css/zyUpload/zyUpload.css" type="text/css">
     <!-- 引用核心层插件 -->
-    <script type="text/javascript" src="${baseurl}/public/js/uploadAttachment/zyFile.js"></script>
+    <script type="text/javascript" src="${baseurl}/public/js/zyUpload/zyFile.js"></script>
     <!-- 引用控制层插件 -->
-    <script type="text/javascript" src="${baseurl}/public/js/uploadAttachment/zyUpload.js"></script>
+    <script type="text/javascript" src="${baseurl}/public/js/zyUpload/zyUpload.js"></script>
     <!-- 引用初始化JS -->
-    <script type="text/javascript" src="${baseurl}/public/js/uploadAttachment/demo.js"></script>
+    <%--<script type="text/javascript" src="${baseurl}/public/js/zyUpload/demo.js"></script>--%>
 
     <style>
         .layui-form-radio span {
             font-size: 10px;
         }
+
         .layui-form-radio i {
             font-size: 15px;
         }
@@ -55,15 +56,17 @@
             background: none;
         }
 
-        .layui-table td,.layui-table th {
+        .layui-table td, .layui-table th {
             font-size: 12px;
             padding: 4px 15px;
 
         }
-        .upload_append_list{
+
+        .upload_append_list {
             height: auto;
         }
-        .upload_preview{
+
+        .upload_preview {
             width: 100%;
         }
     </style>
@@ -103,10 +106,10 @@
                         </div>
                     </div>
                     <div class="layui-form-item">
-                            <div class="layui-input-inline" style="width: 150px ;">
-                                <input type="text" name="no" id="no-search" lay-verify="title" autocomplete="off"
-                                       placeholder="学号" value="" class="layui-input">
-                            </div>
+                        <div class="layui-input-inline" style="width: 150px ;">
+                            <input type="text" name="no" id="no-search" lay-verify="title" autocomplete="off"
+                                   placeholder="学号" value="" class="layui-input">
+                        </div>
                         <div class="layui-input-inline" style="width: 150px ;">
                             <input type="text" name="name" id="name_search" lay-verify="title"
                                    autocomplete="off"
@@ -180,7 +183,8 @@
     </div>
     </div>
 </section>
-<div id="demo" class="demo" style="display: none"></div>
+<div id="demo" class="demo" style="display: none">
+</div>
 <%@include file="layer.jsp" %>
 <%@include file="pdf.jsp" %>
 <script type="text/javascript" src="${baseurl}/public/css/timeAsix/inc/colorbox.js"></script>
@@ -216,6 +220,7 @@
     let communication;
     let student;
     let no;
+    let studentNoByUpload;
     layui.use(['jquery', 'layer', 'element', 'laypage', 'form', 'laytpl'], function () {
         window.jQuery = window.$ = layui.jquery;
         window.layer = layui.layer;
@@ -273,6 +278,7 @@
                 });
             },
             add: function (studentNo) {
+                window.localStorage.setItem("studentNoByUpdate", studentNo);
                 $.post(baseUrl + "/studentClass/student", {studentNo: studentNo}, function (data) {
                     if (data.result) {
                         student = data.data;
@@ -295,6 +301,45 @@
                 $("#communicationPhone").formatInput({
                     formatArr: [3, 4, 4],
                     delimiter: '-'
+                });
+
+                // 初始化插件
+                $("#demo").zyUpload({
+                    width            :   "650px",                 // 宽度
+                    height           :   "400px",                 // 宽度
+                    studentNoByUpdate :   window.localStorage.getItem("studentNoByUpdate"),// 学号
+                    itemWidth        :   "120px",                 // 文件项的宽度
+                    itemHeight       :   "100px",                 // 文件项的高度
+                    url              :   baseUrl + "/communication/UploadAction",  // 上传文件的路径
+                    multiple         :   true,                    // 是否可以多个文件上传
+                    dragDrop         :   true,                    // 是否可以拖动上传文件
+                    del              :   true,                    // 是否可以删除文件
+                    finishDel        :   false,  				  // 是否在上传文件完成后删除预览
+                    /* 外部获得的回调接口 */
+                    onSelect: function(files, allFiles){                    // 选择文件的回调方法
+                        console.info("当前选择了以下文件：");
+                        console.info(files);
+                        console.info("之前没上传的文件：");
+                        console.info(allFiles);
+                    },
+                    onDelete: function(file, surplusFiles){                     // 删除一个文件的回调方法
+                        console.info("当前删除了此文件：");
+                        console.info(file);
+                        console.info("当前剩余的文件：");
+                        console.info(surplusFiles);
+                    },
+                    onSuccess: function(file){                    // 文件上传成功的回调方法
+                        console.info("此文件上传成功：");
+                        console.info(file);
+                    },
+                    onFailure: function(file){                    // 文件上传失败的回调方法
+                        console.info("此文件上传失败：");
+                        console.info(file);
+                    },
+                    onComplete: function(responseInfo){           // 上传完成的回调方法
+                        console.info("文件上传完成");
+                        console.info(responseInfo);
+                    }
                 });
 
             },
@@ -466,8 +511,11 @@
                     form.render();
                 })
             },
-            queryClassByDirectionIdAndLevel: function (directionId,level) {
-                $.post(baseUrl + "/studentClass/queryClassByDirectionIdAndLevel", {directionId: directionId,level:level}, function (data) {
+            queryClassByDirectionIdAndLevel: function (directionId, level) {
+                $.post(baseUrl + "/studentClass/queryClassByDirectionIdAndLevel", {
+                    directionId: directionId,
+                    level: level
+                }, function (data) {
                     if (data.result) {
                         $("#queryClass").html(loadOptionsHtml(data.data, "-"))
                     }
@@ -493,12 +541,12 @@
             });
             form.on('select(direction)', function (data) {
                 let level = $("#semester_search").val();
-                communication.queryClassByDirectionIdAndLevel(data.value,level);
+                communication.queryClassByDirectionIdAndLevel(data.value, level);
 
             });
             form.on('select(level)', function (data) {
                 let directionId = $("#findDirection").val();
-                communication.queryClassByDirectionIdAndLevel(directionId,data.value);
+                communication.queryClassByDirectionIdAndLevel(directionId, data.value);
 
             });
             form.on('select(queryAreaOfRoom)', function (data) {
@@ -533,5 +581,5 @@
         printPDF(personalCommunicationFeedbackRecords);
     }
 </script>
-
+</body>
 </html>

@@ -8,6 +8,7 @@ public class Student {
     private String classesId;
     private String gender;
     private String parentName;
+    private String zyFile;
 
     public String getDepartmentId() {
         return departmentId;
@@ -63,5 +64,27 @@ public class Student {
 
     public void setParentName(String parentName) {
         this.parentName = parentName;
+    }
+
+    public String getZyFile() {
+        return zyFile;
+    }
+
+    public void setZyFile(String zyFile) {
+        this.zyFile = zyFile;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "no='" + no + '\'' +
+                ", name='" + name + '\'' +
+                ", departmentId='" + departmentId + '\'' +
+                ", directionId='" + directionId + '\'' +
+                ", classesId='" + classesId + '\'' +
+                ", gender='" + gender + '\'' +
+                ", parentName='" + parentName + '\'' +
+                ", zyFile='" + zyFile + '\'' +
+                '}';
     }
 }

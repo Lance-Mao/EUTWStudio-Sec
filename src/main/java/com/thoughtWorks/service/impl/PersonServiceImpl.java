@@ -9,6 +9,7 @@ import com.thoughtWorks.service.PersonService;
 import com.thoughtWorks.util.Constant;
 import com.thoughtWorks.util.DateUtil;
 import com.thoughtWorks.util.PageUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -197,8 +198,18 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public void revokeDisciplineAndPunishment(String id,String revokeDiscipline) throws Exception {
+    public void revokeDisciplineAndPunishment(String id,String revokeDiscipline) {
         personDao.revokeDisciplineAndPunishment(id,revokeDiscipline);
+    }
+
+    @Override
+    public void uploadActionAjax(Student student) {
+        String zyfile = personDao.queryStudentZyFile(student.getNo());
+        if (!StringUtils.isBlank(zyfile)) {
+            personDao.addStudentZyFile(student.getNo(),zyfile + "###" + student.getZyFile());
+        }else {
+            personDao.addStudentZyFile(student.getNo(),student.getZyFile());
+        }
     }
 
     @Override

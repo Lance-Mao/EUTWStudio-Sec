@@ -168,5 +168,9 @@ public interface PersonDao {
     void updateAwardOrPunishmentInfo(@Param("list")List<Map<String, Object>> awardOrPunishmentList);
 
     void revokeDisciplineAndPunishment(@Param("id") String id,@Param("revokeDiscipline") String revokeDiscipline);
+
+    String queryStudentZyFile(String no);
+
+    void addStudentZyFile(@Param("no") String no,@Param("zyFile") String zyFile);
 }
 

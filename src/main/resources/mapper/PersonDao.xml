@@ -1289,4 +1289,15 @@ WHERE student.no =#{studentNo}
         WHERE id = #{id}
     </update>
 
+    <select id="queryStudentZyFile" parameterType="string" resultType="string">
+        select zyFile from t_student
+        WHERE no = #{no}
+    </select>
+
+    <update id="addStudentZyFile" parameterType="map">
+        UPDATE t_student
+        SET zyFile = #{zyFile}
+        WHERE no = #{no}
+    </update>
+
 </mapper>

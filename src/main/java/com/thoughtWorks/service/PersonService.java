@@ -147,4 +147,6 @@ public interface PersonService {
     void updateAwardOrPunishmentInfo(List<Map<String, Object>> awardOrPunishmentList)throws Exception;
 
     void revokeDisciplineAndPunishment(String id,String revokeDiscipline)throws Exception;
+
+    void uploadActionAjax(Student student)throws Exception;
 }
