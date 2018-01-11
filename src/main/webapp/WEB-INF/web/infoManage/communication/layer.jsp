@@ -228,6 +228,13 @@
 </div>
 
 <div id="update" style="display: none;background: #fff;">
+    <form action="${baseurl}/communication/downloadZyFile" method="post">
+        <input type="hidden" id="getZyFiles" name="fileNames">
+        <button class="layui-btn" id="downloadZyFile"
+                style="float: right;margin-left: 5px"><i class="layui-icon">&#xe630;</i>下载附件
+        </button>
+    </form>
+
     <a class="layui-btn" onclick="printPdf()" id="printPDF" style="float: right"><i class="layui-icon">&#xe630;</i>导出
         PDF</a>
 
@@ -251,7 +258,7 @@
                 <span style="float:left;display: block;width: 18%;height: 200px;background-color: #33B8AD"></span>
                 <span style="float:left;display: block;width: 18%;height: 200px;background-color: #2fd2c3"></span>
                 <span style="float:left;display: block;width: 18%;height: 200px;text-align: center;font-weight: lighter"><span
-                        style="font-size: 150px;color: grey;">></span></span>
+                        style="font-size: 150px;color: grey;"></span></span>
                 <span style="float:left;display: block;width: 6%;height: 200px;background-color: #4ED9C6"></span>
             </div>
         </div>

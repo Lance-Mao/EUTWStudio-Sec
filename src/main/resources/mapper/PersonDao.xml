@@ -605,6 +605,7 @@
             student.native_place,
             student.idcard,
             student.level,
+            student.zyFile,
             student.political_status,
             classes.name classesName,
             department.name department,

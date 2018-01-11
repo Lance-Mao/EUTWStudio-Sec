@@ -8,6 +8,7 @@ import com.thoughtWorks.service.PersonService;
 import com.thoughtWorks.util.Constant;
 import com.thoughtWorks.util.FileToolkit;
 import com.thoughtWorks.util.PageUtil;
+import com.thoughtWorks.util.ZipUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
@@ -25,6 +26,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Component
 @RequestMapping("/communication")
@@ -259,6 +262,31 @@ public class CommunicationController {
             e.printStackTrace();
         }
         return Result.failure(null, Constant.UPLOAD_FAILURE);
+    }
+
+
+    @RequestMapping(value = "/downloadZyFile", method = RequestMethod.POST)
+    public void downloadZyFile(@RequestParam("fileNames") String fileNames,HttpServletRequest request, HttpServletResponse response) {
+
+        try {
+            response.setContentType("application/x-msdownload");
+            response.setHeader("Content-Disposition", "attachment;filename=zyFile.zip");
+            String path = request.getServletContext().getRealPath("");
+            String[] pathItem = fileNames.split("###");
+            System.out.println("123"+Arrays.toString(pathItem));
+            System.out.println("获取数据："+fileNames);
+
+
+            ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
+            for(String filename : pathItem){
+                ZipUtils.doCompress(path + "/" + filename, zos);
+                response.flushBuffer();
+            }
+            zos.flush();
+            zos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
