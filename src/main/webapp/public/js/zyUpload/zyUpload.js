@@ -52,9 +52,9 @@
             this.createHtml = function () {
                 var multiple = "";  // 设置多选的参数
                 para.multiple ? multiple = "multiple" : multiple = "";
-                var html = '';
 
                 if (para.dragDrop) {
+                    var html = '';
                     // 创建带有拖动的html
                     html += '<form id="uploadForm" action="' + para.url + '" method="post" enctype="multipart/form-data">';
                     html += '	<div class="upload_box">';
@@ -85,6 +85,7 @@
                     html += '	</div>';
                     html += '</form>';
                 } else {
+                    var html = '';
                     var imgWidth = parseInt(para.itemWidth.replace("px", "")) - 15;
                     // 创建不带有拖动的html
                     html += '<form id="uploadForm" action="' + para.url + '" method="post" enctype="multipart/form-data">';
@@ -117,7 +118,7 @@
                     html += '</form>';
                 }
 
-                $(self).append(html).css({"width": para.width, "height": para.height});
+                $(self).html("").append(html).css({"width": para.width, "height": para.height});
 
                 // 初始化html之后绑定按钮的点击事件
                 this.addEvent();
