@@ -266,20 +266,22 @@ public class CommunicationController {
 
 
     @RequestMapping(value = "/downloadZyFile", method = RequestMethod.POST)
-    public void downloadZyFile(@RequestParam("fileNames") String fileNames,HttpServletRequest request, HttpServletResponse response) {
+    public void downloadZyFile(@RequestParam("fileNames") String fileNames, HttpServletRequest request, HttpServletResponse response) {
 
         try {
             response.setContentType("application/x-msdownload");
             response.setHeader("Content-Disposition", "attachment;filename=zyFile.zip");
             String path = request.getServletContext().getRealPath("");
             String[] pathItem = fileNames.split("###");
-            System.out.println("123"+Arrays.toString(pathItem));
-            System.out.println("获取数据："+fileNames);
 
 
             ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
-            for(String filename : pathItem){
-                ZipUtils.doCompress(path + "/" + filename, zos);
+            for (String filename : pathItem) {
+                File fileItem = new File(path + "/" + filename);
+                if (fileItem.exists()) {
+                    ZipUtils.doCompress(path + "/" + filename, zos);
+                    continue;
+                }
                 response.flushBuffer();
             }
             zos.flush();
