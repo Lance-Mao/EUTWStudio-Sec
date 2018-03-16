@@ -15,9 +15,9 @@
 <style>
     #preview li {
         float: left;
-        font-size: 14px;
-        margin: 3% 0 1% 3%;
-        font-weight: 400;
+        font-size: 16px;
+        margin: 1% 0 1% 1%;
+        font-weight: normal;
     }
 
     #stu_info td {
@@ -32,8 +32,9 @@
     @media   print   {
         #stu_info td   {
             text-align: center;
-            font-size:   12px;
+            font-size:   16px;
             padding: 3px 5px;
+            border: 1px solid black;
             -webkit-transform-origin-x: 0;
             -webkit-transform: scale(0.80);
         }
@@ -47,9 +48,9 @@
         }
         #head li {
             float: left;
-            font-size: 14px;
-            margin: 5px 0 1% 3%;
-            font-weight: 400;
+            font-size: 16px;
+            margin: 3px 0 1% 2%;
+            font-weight: normal;
         }
         #excel{
             display: none;

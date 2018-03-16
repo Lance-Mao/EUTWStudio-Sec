@@ -35,7 +35,7 @@
 
 </script>
 
-<div id="preview" style="display: none;width: auto;margin-top: 20px;text-align: center;padding: 2%">
+<div id="preview" style="display: none;width: auto;margin-top: 10px;text-align: center;padding: 2%">
     <button class="layui-btn " id = "excel" style="float:right;" onclick="resultReport.exportRegisterReport()">
         <i class="layui-icon">&#xe61e;</i>导出 PDF
     </button>
