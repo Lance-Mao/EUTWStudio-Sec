@@ -50,6 +50,7 @@
 
         .layui-elem-quote {
             padding-bottom: 1px;
+            font-size: small;
         }
 
         .layui-disabled {
@@ -69,6 +70,7 @@
         .upload_preview {
             width: 100%;
         }
+
     </style>
 </head>
 <body>
@@ -76,29 +78,29 @@
 <section class="larry-grid layui-form">
     <div class="larry-personal">
         <div class="layui-tab">
-            <blockquote class="layui-elem-quote mylog-info-tit" style="height: 140px">
+            <blockquote class="layui-elem-quote mylog-info-tit">
                 <from id="searchInfo">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <div class="layui-input-inline " style="width: 150px ;">
+                            <div class="layui-input-inline ">
                                 <select lay-filter="department" id="module_search">
                                     <option value="">系</option>
                                 </select>
                             </div>
 
-                            <div class="layui-input-inline" style="width: 150px;">
+                            <div class="layui-input-inline">
                                 <select lay-filter="level" id="semester_search">
                                     <option value="">年级</option>
                                 </select>
                             </div>
 
-                            <div class="layui-input-inline" style="width: 150px;">
+                            <div class="layui-input-inline">
                                 <select lay-filter="direction" id="findDirection">
                                     <option value="">方向</option>
                                 </select>
                             </div>
 
-                            <div class="layui-input-inline" style="width: 150px;">
+                            <div class="layui-input-inline">
                                 <select lay-filter="profession" id="queryClass">
                                     <option value="">班级</option>
                                 </select>
@@ -106,28 +108,28 @@
                         </div>
                     </div>
                     <div class="layui-form-item">
-                        <div class="layui-input-inline" style="width: 150px ;">
+                        <div class="layui-input-inline">
                             <input type="text" name="no" id="no-search" lay-verify="title" autocomplete="off"
                                    placeholder="学号" value="" class="layui-input">
                         </div>
-                        <div class="layui-input-inline" style="width: 150px ;">
+                        <div class="layui-input-inline">
                             <input type="text" name="name" id="name_search" lay-verify="title"
                                    autocomplete="off"
                                    placeholder="姓名" class="layui-input">
                         </div>
-                        <div class="layui-input-inline" style="width: 150px ;">
+                        <div class="layui-input-inline">
 
                             <select lay-filter="queryAreaOfRoom" name="" id="queryAreaOfRoom">
                                 <option value="">区号</option>
                             </select>
                         </div>
-                        <div class="layui-input-inline" style="width: 150px ;">
+                        <div class="layui-input-inline">
                             <select lay-filter="queryFloor" id="queryFloor">
                                 <option value="">层号</option>
                             </select>
                         </div>
 
-                        <div class="layui-input-inline" style="width: 150px ;">
+                        <div class="layui-input-inline">
                             <select lay-filter="queryRoom" id="queryRoom">
                                 <option value="">宿舍</option>
                             </select>
