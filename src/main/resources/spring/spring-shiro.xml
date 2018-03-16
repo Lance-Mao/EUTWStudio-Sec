@@ -54,8 +54,7 @@
         <!-- session的失效时长，单位毫秒 -->
         <property name="globalSessionTimeout" value="600000"/>
         <!-- 删除失效的session -->
-        <property name="deleteInvalidSessions" value="true"/>
-    </bean>
+        <property name="deleteInvalidSessions" value="true"/>    </bean>
 
     <!--==============================================3、realm===================================================-->
     <!-- Shiro配置,继承自AuthorizingRealm的自定义Realm (解决初始化时的依赖循环问题，通过这里向realm中注入userservice实现)-->
