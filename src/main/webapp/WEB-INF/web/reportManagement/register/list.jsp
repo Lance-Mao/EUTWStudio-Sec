@@ -38,6 +38,10 @@
             -webkit-transform-origin-x: 0;
             -webkit-transform: scale(0.80);
         }
+        .layui-table td {
+            line-height: 15px;
+            border: 1px solid #000000;
+        }
         #head_image1{
 
         }
