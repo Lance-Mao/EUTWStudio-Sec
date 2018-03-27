@@ -32,11 +32,9 @@
     @media   print   {
         #stu_info td   {
             text-align: center;
-            font-size:   16px;
+            font-size:   14px;
             padding: 3px 5px;
             border: 1px solid black;
-            -webkit-transform-origin-x: 0;
-            -webkit-transform: scale(0.80);
         }
         .layui-table td {
             line-height: 15px;
@@ -48,7 +46,7 @@
         #head_image{
             width:130px;
             height:150px;
-            margin: -2em -5em;
+            margin: 0em -3em;
         }
         #head li {
             float: left;
