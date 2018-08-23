@@ -203,8 +203,8 @@
                         layer.open({
                             type: 1,
                             title: "成绩单",
-                            area: ["100%", "100%"]
-                            , content: $("#preview")
+                            area: ["100%", "100%"],
+                            content: $("#preview")
                         });
                     } else {
                         layer.msg(data.msg);
