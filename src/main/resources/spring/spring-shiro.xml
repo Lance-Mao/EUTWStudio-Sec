@@ -85,4 +85,9 @@
     <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
         <property name="securityManager" ref="securityManager" />
     </bean>-->
+
+
+    <bean id="dbRealm" class="com.thoughtWorks.shiro.CustomRealm">
+        <property name="authenticationCachingEnabled" value="false"></property>
+    </bean>
 </beans>

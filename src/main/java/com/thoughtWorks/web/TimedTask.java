@@ -75,7 +75,7 @@ public class TimedTask {
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Long time = new Long((date.substring(date.indexOf("(") + 1, date.indexOf(")"))));
                     result1.setTestEntityTime(format.parse(format.format(time)));
-                    result1.setNature(Integer.parseInt(jsonObjectItem.get("ISMAINCLASS").toString()));
+                    result1.setNature(Integer.parseInt(jsonObjectItem.get("ISMAINCLASS").toString()) == 0 ? 1 : 0);
                     if (jsonObjectItem.get("ISPASS").toString() == "null") {
                         result1.setIsPass(0);
                     } else {
